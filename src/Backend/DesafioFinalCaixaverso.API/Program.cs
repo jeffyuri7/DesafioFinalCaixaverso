@@ -1,11 +1,17 @@
+using DesafioFinalCaixaverso.Aplicacao;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+builder.Services.RegistrarAplicacao();
+
+builder.Services.AddRouting(opcoes => opcoes.LowercaseUrls = true);
 
 var app = builder.Build();
 

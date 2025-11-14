@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Backend\DesafioFinalCaixaverso.Domain\DesafioFinalCaixaverso.Dominio.csproj" />
+  </ItemGroup>
+
 </Project>

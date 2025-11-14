@@ -2,18 +2,18 @@
   <Folder Name="/src/" />
   <Folder Name="/src/Backend/">
     <Project Path="E:/Projetos/DesafioFinalCaixaverso/src/Backend/DesafioFinalCaixaverso.API/DesafioFinalCaixaverso.API.csproj" />
-    <Project Path="src/Backend/DesafioFinalCaixaverso.Application/DesafioFinalCaixaverso.Application.csproj" Id="ce8009b8-bdb6-4f3f-abfb-951674b3edd2" />
-    <Project Path="src/Backend/DesafioFinalCaixaverso.Domain/DesafioFinalCaixaverso.Domain.csproj" Id="8e8a9170-2013-466d-9396-010b17659bf7" />
-    <Project Path="src/Backend/DesafioFinalCaixaverso.Infrastructure/DesafioFinalCaixaverso.Infrastructure.csproj" Id="ad3ac6ee-713a-41d9-aef1-043f6309500b" />
+    <Project Path="src/Backend/DesafioFinalCaixaverso.Application/DesafioFinalCaixaverso.Aplicacao.csproj" Id="ce8009b8-bdb6-4f3f-abfb-951674b3edd2" />
+    <Project Path="src/Backend/DesafioFinalCaixaverso.Domain/DesafioFinalCaixaverso.Dominio.csproj" Id="8e8a9170-2013-466d-9396-010b17659bf7" />
+    <Project Path="src/Backend/DesafioFinalCaixaverso.Infrastructure/DesafioFinalCaixaverso.Infraestrutura.csproj" Id="ad3ac6ee-713a-41d9-aef1-043f6309500b" />
   </Folder>
   <Folder Name="/src/Shared/">
-    <Project Path="src/Shared/DesafioFinalCaixaverso.Communications/DesafioFinalCaixaverso.Communications.csproj" Id="8b2e613b-4549-41ea-b597-55573ea62a4e" />
-    <Project Path="src/Shared/DesafioFinalCaixaverso.Exceptions/DesafioFinalCaixaverso.Exceptions.csproj" Id="9754578b-0083-420e-9ae0-f47d59a23e47" />
+    <Project Path="src/Shared/DesafioFinalCaixaverso.Communications/DesafioFinalCaixaverso.Comunicacoes.csproj" Id="8b2e613b-4549-41ea-b597-55573ea62a4e" />
+    <Project Path="src/Shared/DesafioFinalCaixaverso.Exceptions/DesafioFinalCaixaverso.Excecoes.csproj" Id="9754578b-0083-420e-9ae0-f47d59a23e47" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/DesafioFinalCaixaverso.TestUtilities/DesafioFinalCaixaverso.TestUtilities.csproj" Id="fb93dc25-17f0-4a0c-8bf7-979d83f09617" />
-    <Project Path="tests/DesafioFinalCaixaverso.UseCases.UnitTests/DesafioFinalCaixaverso.UseCases.UnitTests.csproj" Id="93a4b7ca-9ee4-401f-a1de-161271007e35" />
-    <Project Path="tests/DesafioFinalCaixaverso.Validators.UnitTests/DesafioFinalCaixaverso.Validators.UnitTests.csproj" Id="a29e3b8c-9b7f-4d9d-bcf4-004ec1cb0375" />
-    <Project Path="tests/DesafioFinalCaixaverso.WebApi.IntegrationTests/DesafioFinalCaixaverso.WebApi.IntegrationTests.csproj" Id="b1d633d7-a6ce-4bcb-ad24-0fae70fcc4de" />
+    <Project Path="tests/DesafioFinalCaixaverso.TestUtilities/DesafioFinalCaixaverso.UtilitariosDeTeste.csproj" Id="fb93dc25-17f0-4a0c-8bf7-979d83f09617" />
+    <Project Path="tests/DesafioFinalCaixaverso.UseCases.UnitTests/DesafioFinalCaixaverso.CasosDeUso.TestesUnitarios.csproj" Id="93a4b7ca-9ee4-401f-a1de-161271007e35" />
+    <Project Path="tests/DesafioFinalCaixaverso.Validators.UnitTests/DesafioFinalCaixaverso.Validacoes.TestesUnitarios.csproj" Id="a29e3b8c-9b7f-4d9d-bcf4-004ec1cb0375" />
+    <Project Path="tests/DesafioFinalCaixaverso.WebApi.IntegrationTests/DesafioFinalCaixaverso.API.TestesDeIntegracao.csproj" Id="b1d633d7-a6ce-4bcb-ad24-0fae70fcc4de" />
   </Folder>
 </Solution>
