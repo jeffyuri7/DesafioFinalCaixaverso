@@ -1,0 +1,6 @@
+@DesafioFinalCaixaverso.API_HostAddress = http://localhost:5145
+
+GET {{DesafioFinalCaixaverso.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
