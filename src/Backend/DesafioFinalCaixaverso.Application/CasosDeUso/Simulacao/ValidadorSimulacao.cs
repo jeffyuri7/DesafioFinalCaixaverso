@@ -1,4 +1,6 @@
-﻿using DesafioFinalCaixaverso.Communications.Requests;
+﻿using System;
+using DesafioFinalCaixaverso.Communications.Requests;
+using DesafioFinalCaixaverso.Exceptions;
 using FluentValidation;
 
 namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
@@ -8,12 +10,16 @@ public class ValidadorSimulacao : AbstractValidator<RequisicaoSimulacaoJson>
     public ValidadorSimulacao()
     {
         RuleFor(simulacao => simulacao.ClienteId)
-            .GreaterThan(0).WithMessage("O valor final deve ser maior que zero.");
+            .NotEqual(Guid.Empty)
+            .WithMessage(MensagensDeExcecao.CLIENTE_ID_INVALIDO);
         RuleFor(simulacao => simulacao.Valor)
-            .GreaterThan(0).WithMessage("O valor do empréstimo deve ser maior que zero.");
+            .GreaterThan(0)
+            .WithMessage(MensagensDeExcecao.VALOR_SIMULACAO_MINIMO);
         RuleFor(simulacao => simulacao.PrazoMeses)
-            .InclusiveBetween(1, 60).WithMessage("O prazo deve ser entre 1 e 60 meses.");
+            .InclusiveBetween(1, 60)
+            .WithMessage(MensagensDeExcecao.PRAZO_SIMULACAO_INVALIDO);
         RuleFor(simulacao => simulacao.TipoProduto)
-            .NotEmpty().WithMessage("O tipo de produto não pode ser vazio.");
+            .NotEmpty()
+            .WithMessage(MensagensDeExcecao.TIPO_PRODUTO_OBRIGATORIO);
     }
 }

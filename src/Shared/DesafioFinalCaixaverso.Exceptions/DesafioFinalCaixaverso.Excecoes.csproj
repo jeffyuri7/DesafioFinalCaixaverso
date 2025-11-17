@@ -4,6 +4,27 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>DesafioFinalCaixaverso.Exceptions</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ResourceMessagesException.Designer.cs" />
+    <EmbeddedResource Remove="ResourceMessagesException.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MensagensDeExcecao.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MensagensDeExcecao.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="MensagensDeExcecao.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MensagensDeExcecao.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
 </Project>

@@ -1,10 +1,10 @@
-﻿using DesafioFinalCaixaverso.Dominio.Entidades;
+﻿using System;
 
 namespace DesafioFinalCaixaverso.Communications.Responses;
 
 public class RespostaSimulacaoJson
 {
-    public Produto ProdutoValidado { get; set; } = new Produto();
-    public Simulacao ResultadoSimulacao { get; set; } = new Simulacao();
+    public ProdutoSimuladoJson ProdutoValidado { get; set; } = new();
+    public ResultadoSimulacaoJson ResultadoSimulacao { get; set; } = new();
     public DateTime DataSimulacao { get; set; }
 }

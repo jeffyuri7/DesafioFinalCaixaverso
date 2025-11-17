@@ -5,5 +5,5 @@ namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
 
 public interface ICasoDeUsoSolicitarSimulacao
 {
-    public Task<RespostaSimulacaoJson> Executar(RequisicaoSimulacaoJson request);
+    public Task<RespostaSimulacaoJson> Executar(RequisicaoSimulacaoJson requisicao);
 }

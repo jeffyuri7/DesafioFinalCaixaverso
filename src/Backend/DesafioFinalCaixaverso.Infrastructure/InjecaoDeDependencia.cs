@@ -1,6 +1,7 @@
 ﻿using DesafioFinalCaixaverso.Dominio.Repositorios;
 using DesafioFinalCaixaverso.Infraestrutura.AcessoDados;
 using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
+using DesafioFinalCaixaverso.Infraestrutura.Repositorios;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -47,5 +48,8 @@ public static class InjecaoDeDependencia
     private static void AdicionarRepositorios(IServiceCollection services)
     {
         services.AddScoped<IUnidadeDeTrabalho, UnidadeDeTrabalho>();
+        services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
+        services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
+        services.AddScoped<ISimulacaoRepositorio, SimulacaoRepositorio>();
     }
 }

@@ -7,14 +7,14 @@ namespace DesafioFinalCaixaverso.API.Controllers;
 public class InvestimentosController : ControllerBaseV1
 {
     [HttpPost("simular-investimento")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SolicitarSimulacao(
-        [FromServices] ICasoDeUsoSolicitarSimulacao useCase,
-        [FromBody] RequisicaoSimulacaoJson request)
+        [FromServices] ICasoDeUsoSolicitarSimulacao casoDeUsoSolicitarSimulacao,
+        [FromBody] RequisicaoSimulacaoJson requisicao)
     {
-        var response = await useCase.Executar(request);
+        var resposta = await casoDeUsoSolicitarSimulacao.Executar(requisicao);
 
-        return Created(string.Empty, response);
+        return Created(string.Empty, resposta);
     }
 }

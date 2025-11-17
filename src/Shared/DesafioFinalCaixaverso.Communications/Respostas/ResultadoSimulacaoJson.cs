@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
-namespace DesafioFinalCaixaverso.Dominio.Entidades;
+namespace DesafioFinalCaixaverso.Communications.Responses;
 
-public class Simulacao
+public class ResultadoSimulacaoJson
 {
     public Guid Id { get; set; }
     public Guid ClienteId { get; set; }
@@ -11,8 +11,4 @@ public class Simulacao
     public decimal ValorFinal { get; set; }
     public decimal RentabilidadeEfetiva { get; set; }
     public int PrazoMeses { get; set; }
-    public DateTime DataSimulacao { get; set; } = DateTime.UtcNow;
-
-    public Cliente? Cliente { get; set; }
-    public Produto? Produto { get; set; }
 }

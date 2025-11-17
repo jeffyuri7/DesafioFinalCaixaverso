@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CLIENTE_ID_INVALIDO" xml:space="preserve">
+    <value>O identificador do cliente é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Cliente não encontrado.</value>
+  </data>
+  <data name="TIPO_PRODUTO_OBRIGATORIO" xml:space="preserve">
+    <value>O tipo de produto é obrigatório.</value>
+  </data>
+  <data name="PRAZO_SIMULACAO_INVALIDO" xml:space="preserve">
+    <value>O prazo da simulação deve estar entre 1 e 60 meses.</value>
+  </data>
+  <data name="VALOR_SIMULACAO_MINIMO" xml:space="preserve">
+    <value>O valor do investimento deve ser maior que zero.</value>
+  </data>
+  <data name="PRODUTO_NAO_ENCONTRADO" xml:space="preserve">
+    <value>Não encontramos um produto compatível com os critérios informados.</value>
+  </data>
+  <data name="ERRO_DESCONHECIDO" xml:space="preserve">
+    <value>Ocorreu um erro inesperado. Tente novamente mais tarde.</value>
+  </data>
+</root>
