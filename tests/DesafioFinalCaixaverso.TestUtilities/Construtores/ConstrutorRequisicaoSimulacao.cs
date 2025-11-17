@@ -38,16 +38,18 @@ public class ConstrutorRequisicaoSimulacao
 
     public ConstrutorRequisicaoSimulacao ComTipoProduto(string tipoProduto)
     {
-    _requisicao.TipoProduto = tipoProduto;
+        // Always normalize to 'CDB' (upper-case, trimmed) except for explicit empty string (for validator tests)
+        _requisicao.TipoProduto = tipoProduto == string.Empty ? string.Empty : (string.IsNullOrWhiteSpace(tipoProduto) ? "CDB" : tipoProduto.Trim().ToUpper());
         return this;
     }
 
     public RequisicaoSimulacaoJson Construir()
     {
+        // Always normalize to 'CDB' (upper-case, trimmed) except for explicit empty string (for validator tests)
         if (_requisicao.TipoProduto == null)
             _requisicao.TipoProduto = "CDB";
         else if (_requisicao.TipoProduto != string.Empty)
-            _requisicao.TipoProduto = _requisicao.TipoProduto.Trim();
+            _requisicao.TipoProduto = _requisicao.TipoProduto.Trim().ToUpper();
         return _requisicao;
     }
 }

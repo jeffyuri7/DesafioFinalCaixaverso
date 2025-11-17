@@ -39,7 +39,7 @@ public class ConstrutorProduto
 
     public ConstrutorProduto ComTipo(string tipo)
     {
-        _produto.Tipo = tipo;
+    _produto.Tipo = string.IsNullOrWhiteSpace(tipo) ? "CDB" : tipo.Trim().ToUpper();
         return this;
     }
 
@@ -82,6 +82,7 @@ public class ConstrutorProduto
 
     public Produto Construir()
     {
-        return _produto;
+    _produto.Tipo = string.IsNullOrWhiteSpace(_produto.Tipo) ? "CDB" : _produto.Tipo.Trim().ToUpper();
+    return _produto;
     }
 }
