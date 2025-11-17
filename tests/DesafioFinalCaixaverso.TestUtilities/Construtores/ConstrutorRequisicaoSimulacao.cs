@@ -46,6 +46,8 @@ public class ConstrutorRequisicaoSimulacao
     {
         if (_requisicao.TipoProduto == null)
             _requisicao.TipoProduto = "CDB";
+        else if (_requisicao.TipoProduto != string.Empty)
+            _requisicao.TipoProduto = _requisicao.TipoProduto.Trim();
         return _requisicao;
     }
 }
