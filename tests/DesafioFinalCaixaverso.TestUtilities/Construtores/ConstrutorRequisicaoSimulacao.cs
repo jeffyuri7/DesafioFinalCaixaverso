@@ -14,7 +14,7 @@ public class ConstrutorRequisicaoSimulacao
             .RuleFor(r => r.ClienteId, _ => Guid.NewGuid())
             .RuleFor(r => r.Valor, faker => faker.Random.Decimal(500m, 100_000m))
             .RuleFor(r => r.PrazoMeses, faker => faker.Random.Int(6, 60))
-            .RuleFor(r => r.TipoProduto, faker => faker.Commerce.ProductMaterial())
+            .RuleFor(r => r.TipoProduto, _ => null) // Always null by default, set explicitly via builder
             .Generate();
     }
 
@@ -38,12 +38,17 @@ public class ConstrutorRequisicaoSimulacao
 
     public ConstrutorRequisicaoSimulacao ComTipoProduto(string tipoProduto)
     {
-        _requisicao.TipoProduto = tipoProduto;
+    _requisicao.TipoProduto = tipoProduto ?? "CDB"; // Default to CDB if null
         return this;
     }
 
     public RequisicaoSimulacaoJson Construir()
     {
+        // Ensure TipoProduto is always set, default to "CDB" if not set
+        if (string.IsNullOrWhiteSpace(_requisicao.TipoProduto))
+        {
+            _requisicao.TipoProduto = "CDB";
+        }
         return _requisicao;
     }
 }
