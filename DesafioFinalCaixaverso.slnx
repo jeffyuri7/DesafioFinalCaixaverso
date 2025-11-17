@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/Backend/">
-    <Project Path="E:/Projetos/DesafioFinalCaixaverso/src/Backend/DesafioFinalCaixaverso.API/DesafioFinalCaixaverso.API.csproj" />
+  <Project Path="src/Backend/DesafioFinalCaixaverso.API/DesafioFinalCaixaverso.API.csproj" />
     <Project Path="src/Backend/DesafioFinalCaixaverso.Application/DesafioFinalCaixaverso.Aplicacao.csproj" Id="ce8009b8-bdb6-4f3f-abfb-951674b3edd2" />
     <Project Path="src/Backend/DesafioFinalCaixaverso.Domain/DesafioFinalCaixaverso.Dominio.csproj" Id="8e8a9170-2013-466d-9396-010b17659bf7" />
     <Project Path="src/Backend/DesafioFinalCaixaverso.Infrastructure/DesafioFinalCaixaverso.Infraestrutura.csproj" Id="ad3ac6ee-713a-41d9-aef1-043f6309500b" />

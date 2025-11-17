@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  sqldb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: caixaverso-sqldb
+    environment:
+      SA_PASSWORD: "Caixaverso@2025"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Caixaverso@2025' -Q \"SELECT 1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    container_name: caixaverso-api
+    build:
+      context: .
+      dockerfile: src/Backend/DesafioFinalCaixaverso.API/Dockerfile
+    depends_on:
+      sqldb:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__CaixaversoDatabase: Server=sqldb,1433;Database=CaixaVersoDB;User Id=sa;Password=Caixaverso@2025;TrustServerCertificate=True;Encrypt=False;
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  sqldata:
