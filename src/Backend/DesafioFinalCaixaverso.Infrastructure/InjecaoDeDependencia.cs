@@ -1,0 +1,51 @@
+﻿using DesafioFinalCaixaverso.Dominio.Repositorios;
+using DesafioFinalCaixaverso.Infraestrutura.AcessoDados;
+using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
+using FluentMigrator.Runner;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel;
+using System.Reflection;
+
+namespace DesafioFinalCaixaverso.Infraestrutura;
+
+public static class InjecaoDeDependencia
+{
+    public static void RegistrarInfraestrutura(this IServiceCollection services, IConfiguration configuration)
+    {
+        AdicionarRepositorios(services);
+
+        //if (configuration.IsUnitTestEnvironment())
+        //    return;
+
+        AdicionarDbContext(services, configuration);
+        AdicionarFluentMigrator(services, configuration);
+    }
+
+    private static void AdicionarFluentMigrator(IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.ConnectionString();
+
+        services.AddFluentMigratorCore()
+            .ConfigureRunner(options => options
+                .AddSqlServer()
+                .WithGlobalConnectionString(connectionString)
+                .ScanIn(Assembly.Load("DesafioFinalCaixaverso.Infraestrutura")).For.All());
+    }
+
+    private static void AdicionarDbContext(IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.ConnectionString();
+
+        services.AddDbContext<CaixaversoDbContext>(dbContextOptions =>
+        {
+            dbContextOptions.UseSqlServer(connectionString);
+        });
+    }
+
+    private static void AdicionarRepositorios(IServiceCollection services)
+    {
+        services.AddScoped<IUnidadeDeTrabalho, UnidadeDeTrabalho>();
+    }
+}

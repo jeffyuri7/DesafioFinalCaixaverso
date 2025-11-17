@@ -1,0 +1,8 @@
+﻿namespace DesafioFinalCaixaverso.Infraestrutura.Migracoes;
+
+public abstract class BancoDeDadosVersao
+{
+    public const int TABELA_CLIENTE = 1;
+    public const int TABELA_PRODUTO = 2;
+    public const int TABELA_SIMULACAO = 3;
+}

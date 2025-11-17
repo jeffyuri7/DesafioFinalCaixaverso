@@ -1,4 +1,7 @@
 using DesafioFinalCaixaverso.Aplicacao;
+using DesafioFinalCaixaverso.Infraestrutura;
+using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
+using DesafioFinalCaixaverso.Infraestrutura.Migracoes;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,7 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.RegistrarAplicacao();
+builder.Services.RegistrarInfraestrutura(builder.Configuration);
 
 builder.Services.AddRouting(opcoes => opcoes.LowercaseUrls = true);
 
@@ -28,4 +32,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+MigrarBancoDeDados();
+
+await app.RunAsync();
+
+void MigrarBancoDeDados()
+{
+    var connectionString = builder.Configuration.ConnectionString();
+
+    var servicoEscopo = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+    BancoDeDadosMigracao.Migracao(connectionString, servicoEscopo.ServiceProvider);
+}
