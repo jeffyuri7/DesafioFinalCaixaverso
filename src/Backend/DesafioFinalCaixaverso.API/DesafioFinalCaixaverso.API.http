@@ -1,6 +1,27 @@
 @DesafioFinalCaixaverso.API_HostAddress = http://localhost:5145
 
-GET {{DesafioFinalCaixaverso.API_HostAddress}}/weatherforecast/
+### Simular investimento
+POST {{DesafioFinalCaixaverso.API_HostAddress}}/v1/investimentos/simular-investimento
+Content-Type: application/json
+Accept: application/json
+
+{
+	"clienteId": "11111111-2222-3333-4444-555555555555",
+	"valor": 7500,
+	"prazoMeses": 18,
+	"tipoProduto": "CDB"
+}
+
+### Histórico de simulações
+GET {{DesafioFinalCaixaverso.API_HostAddress}}/v1/investimentos/simulacoes
+Accept: application/json
+
+### Simulações agregadas por produto/dia
+GET {{DesafioFinalCaixaverso.API_HostAddress}}/v1/investimentos/simulacoes/por-produto-dia
+Accept: application/json
+
+### Telemetria
+GET {{DesafioFinalCaixaverso.API_HostAddress}}/v1/telemetria
 Accept: application/json
 
 ###

@@ -4,13 +4,22 @@ using DesafioFinalCaixaverso.Aplicacao;
 using DesafioFinalCaixaverso.Infraestrutura;
 using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
 using DesafioFinalCaixaverso.Infraestrutura.Migracoes;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options => options.Filters.Add(typeof(FiltroDeExcecao)));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Desafio Final Caixaverso API",
+        Version = "v1",
+        Description = "Endpoints de simulação de investimentos, consultas históricas e telemetria."
+    });
+    options.EnableAnnotations();
+});
 
 
 builder.Services.RegistrarAplicacao();

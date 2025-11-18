@@ -1,14 +1,21 @@
 ﻿using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
 using DesafioFinalCaixaverso.Communications.Requests;
+using DesafioFinalCaixaverso.Communications.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace DesafioFinalCaixaverso.API.Controllers;
 
 public class InvestimentosController : ControllerBaseV1
 {
     [HttpPost("simular-investimento")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Solicita uma nova simulação.",
+        Description = "Valida o cliente, seleciona o produto compatível e retorna o resultado da simulação.",
+        Tags = new[] { "Investimentos" })]
+    [ProducesResponseType(typeof(RespostaSimulacaoJson), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(RespostaErroJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(RespostaErroJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SolicitarSimulacao(
         [FromServices] ICasoDeUsoSolicitarSimulacao casoDeUsoSolicitarSimulacao,
         [FromBody] RequisicaoSimulacaoJson requisicao)
@@ -19,7 +26,11 @@ public class InvestimentosController : ControllerBaseV1
     }
 
     [HttpGet("simulacoes")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [SwaggerOperation(
+        Summary = "Lista o histórico completo de simulações.",
+        Description = "Retorna todas as simulações ordenadas pela data mais recente primeiro.",
+        Tags = new[] { "Investimentos" })]
+    [ProducesResponseType(typeof(IEnumerable<HistoricoSimulacaoJson>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListarHistorico(
         [FromServices] ICasoDeUsoConsultarHistoricoSimulacoes casoDeUsoConsultarHistoricoSimulacoes)
     {
@@ -28,7 +39,11 @@ public class InvestimentosController : ControllerBaseV1
     }
 
     [HttpGet("simulacoes/por-produto-dia")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [SwaggerOperation(
+        Summary = "Agrupa simulações por produto e dia.",
+        Description = "Fornece indicadores de volume diário por produto para dashboards.",
+        Tags = new[] { "Investimentos" })]
+    [ProducesResponseType(typeof(IEnumerable<SimulacoesPorProdutoDiaJson>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListarSimulacoesPorProdutoDia(
         [FromServices] ICasoDeUsoConsultarSimulacoesPorProdutoDia casoDeUsoConsultarSimulacoesPorProdutoDia)
     {
