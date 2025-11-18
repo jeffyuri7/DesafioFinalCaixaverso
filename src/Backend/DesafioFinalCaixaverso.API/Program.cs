@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.RegistrarAplicacao();
-builder.Services.RegistrarInfraestrutura(builder.Configuration);
+builder.Services.RegistrarInfraestrutura(builder.Configuration, builder.Environment);
 
 builder.Services.AddRouting(opcoes => opcoes.LowercaseUrls = true);
 
@@ -41,9 +41,17 @@ await app.RunAsync();
 
 void MigrarBancoDeDados()
 {
+    if (builder.Environment.IsEnvironment("Testing"))
+        return;
+
     var connectionString = builder.Configuration.ConnectionString();
 
     var servicoEscopo = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
     BancoDeDadosMigracao.Migracao(connectionString, servicoEscopo.ServiceProvider);
+}
+
+public partial class Program
+{
+    protected Program() { }
 }

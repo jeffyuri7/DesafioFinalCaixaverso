@@ -31,10 +31,31 @@ public class SimulacaoRepositorio : ISimulacaoRepositorio
 
     public async Task<IReadOnlyCollection<SimulacoesPorProdutoDiaResultado>> ListarAgrupadoPorProdutoEDiaAsync(CancellationToken cancellationToken = default)
     {
-        var agrupado = await _dbContext.Simulacoes
+        var query = _dbContext.Simulacoes
             .AsNoTracking()
             .Include(simulacao => simulacao.Produto)
-            .Where(simulacao => simulacao.Produto != null)
+            .Where(simulacao => simulacao.Produto != null);
+
+        if (_dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var agrupadoMemoria = query
+                .AsEnumerable()
+                .GroupBy(simulacao => new { Produto = simulacao.Produto!.Nome, Dia = simulacao.DataSimulacao.Date })
+                .Select(grupo => new SimulacoesPorProdutoDiaResultado(
+                    grupo.Key.Produto,
+                    grupo.Key.Dia,
+                    grupo.Count(),
+                    grupo.Sum(simulacao => simulacao.ValorInvestido)))
+                .OrderByDescending(resultado => resultado.Dia)
+                .ThenBy(resultado => resultado.Produto)
+                .ToList();
+
+            return agrupadoMemoria.AsReadOnly();
+        }
+
+        var agrupado = await query
             .GroupBy(simulacao => new { Produto = simulacao.Produto!.Nome, Dia = simulacao.DataSimulacao.Date })
             .Select(grupo => new SimulacoesPorProdutoDiaResultado(
                 grupo.Key.Produto,

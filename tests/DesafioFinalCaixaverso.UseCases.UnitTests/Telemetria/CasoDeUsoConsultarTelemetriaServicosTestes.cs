@@ -28,4 +28,24 @@ public class CasoDeUsoConsultarTelemetriaServicosTestes
         resposta.ShouldHaveSingleItem();
         resposta.First().QuantidadeChamadas.ShouldBe(3);
     }
+
+    [Fact]
+    public async Task Deve_preservar_data_da_ultima_chamada()
+    {
+        var ultimaChamada = new DateTime(2025, 11, 17, 8, 30, 0, DateTimeKind.Utc);
+        var repositorio = new TelemetriaServicoRepositorioFalso();
+        repositorio.Registros.Add(new TelemetriaServico
+        {
+            Id = Guid.NewGuid(),
+            Servico = "v1/telemetria",
+            QuantidadeChamadas = 1,
+            UltimaChamada = ultimaChamada
+        });
+
+        var casoDeUso = new CasoDeUsoConsultarTelemetriaServicos(repositorio);
+
+        var resposta = await casoDeUso.Executar();
+
+        resposta.ShouldHaveSingleItem().UltimaChamada.ShouldBe(ultimaChamada);
+    }
 }

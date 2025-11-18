@@ -6,19 +6,19 @@ using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel;
+using Microsoft.Extensions.Hosting;
 using System.Reflection;
 
 namespace DesafioFinalCaixaverso.Infraestrutura;
 
 public static class InjecaoDeDependencia
 {
-    public static void RegistrarInfraestrutura(this IServiceCollection services, IConfiguration configuration)
+    public static void RegistrarInfraestrutura(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         AdicionarRepositorios(services);
 
-        //if (configuration.IsUnitTestEnvironment())
-        //    return;
+        if (environment.IsEnvironment("Testing"))
+            return;
 
         AdicionarDbContext(services, configuration);
         AdicionarFluentMigrator(services, configuration);

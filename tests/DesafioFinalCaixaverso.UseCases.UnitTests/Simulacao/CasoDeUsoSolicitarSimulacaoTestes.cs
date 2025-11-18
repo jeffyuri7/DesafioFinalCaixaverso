@@ -54,6 +54,7 @@ public class CasoDeUsoSolicitarSimulacaoTestes
             .ComMinimoInvestimento(500)
             .ComPrazo(6, 48)
             .ComRentabilidade(0.15m)
+            .Ativo(true)
             .Construir();
 
         var produtoRepositorio = new ProdutoRepositorioFalso().ComProdutos(new[] { produto });
