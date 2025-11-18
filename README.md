@@ -1,4 +1,3 @@
-
 # DesafioFinalCaixaverso
 
 ## Requisitos
@@ -19,6 +18,12 @@ dotnet test DesafioFinalCaixaverso.slnx
 docker compose up -d --build
 ```
 A API estará disponível em `http://localhost:8080/swagger`.
+
+### Endpoints 
+- `POST v1/investimentos/simular-investimento`
+- `GET v1/investimentos/simulacoes`
+- `GET v1/investimentos/simulacoes/por-produto-dia`
+- `GET v1/telemetria`
 
 ## Seed de dados
 ```powershell

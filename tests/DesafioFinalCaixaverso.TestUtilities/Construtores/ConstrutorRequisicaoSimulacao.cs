@@ -14,7 +14,7 @@ public class ConstrutorRequisicaoSimulacao
             .RuleFor(r => r.ClienteId, _ => Guid.NewGuid())
             .RuleFor(r => r.Valor, faker => faker.Random.Decimal(500m, 100_000m))
             .RuleFor(r => r.PrazoMeses, faker => faker.Random.Int(6, 60))
-            .RuleFor(r => r.TipoProduto, _ => null) 
+            .RuleFor(r => r.TipoProduto, _ => null!) 
             .Generate();
     }
 
@@ -38,14 +38,12 @@ public class ConstrutorRequisicaoSimulacao
 
     public ConstrutorRequisicaoSimulacao ComTipoProduto(string tipoProduto)
     {
-        // Always normalize to 'CDB' (upper-case, trimmed) except for explicit empty string (for validator tests)
         _requisicao.TipoProduto = tipoProduto == string.Empty ? string.Empty : (string.IsNullOrWhiteSpace(tipoProduto) ? "CDB" : tipoProduto.Trim().ToUpper());
         return this;
     }
 
     public RequisicaoSimulacaoJson Construir()
     {
-        // Always normalize to 'CDB' (upper-case, trimmed) except for explicit empty string (for validator tests)
         if (_requisicao.TipoProduto == null)
             _requisicao.TipoProduto = "CDB";
         else if (_requisicao.TipoProduto != string.Empty)
