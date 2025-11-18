@@ -1,4 +1,5 @@
 using DesafioFinalCaixaverso.API.Filters;
+using DesafioFinalCaixaverso.API.Middlewares;
 using DesafioFinalCaixaverso.Aplicacao;
 using DesafioFinalCaixaverso.Infraestrutura;
 using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
@@ -29,6 +30,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<RegistroTelemetriaMiddleware>();
 
 app.MapControllers();
 

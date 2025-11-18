@@ -17,4 +17,22 @@ public class InvestimentosController : ControllerBaseV1
 
         return Created(string.Empty, resposta);
     }
+
+    [HttpGet("simulacoes")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ListarHistorico(
+        [FromServices] ICasoDeUsoConsultarHistoricoSimulacoes casoDeUsoConsultarHistoricoSimulacoes)
+    {
+        var historico = await casoDeUsoConsultarHistoricoSimulacoes.Executar();
+        return Ok(historico);
+    }
+
+    [HttpGet("simulacoes/por-produto-dia")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ListarSimulacoesPorProdutoDia(
+        [FromServices] ICasoDeUsoConsultarSimulacoesPorProdutoDia casoDeUsoConsultarSimulacoesPorProdutoDia)
+    {
+        var agrupado = await casoDeUsoConsultarSimulacoesPorProdutoDia.Executar();
+        return Ok(agrupado);
+    }
 }
