@@ -21,4 +21,15 @@ public class QuestionarioInvestidorRepositorio : IQuestionarioInvestidorReposito
             .AsNoTracking()
             .FirstOrDefaultAsync(questionario => questionario.ClienteId == clienteId, cancellationToken);
     }
+
+    public async Task AdicionarAsync(QuestionarioInvestidor questionario, CancellationToken cancellationToken = default)
+    {
+        await _dbContext.QuestionariosInvestidor.AddAsync(questionario, cancellationToken);
+    }
+
+    public Task AtualizarAsync(QuestionarioInvestidor questionario, CancellationToken cancellationToken = default)
+    {
+        _dbContext.QuestionariosInvestidor.Update(questionario);
+        return Task.CompletedTask;
+    }
 }

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DesafioFinalCaixaverso.Domain\DesafioFinalCaixaverso.Dominio.csproj" />
+    <ProjectReference Include="..\..\Shared\DesafioFinalCaixaverso.Exceptions\DesafioFinalCaixaverso.Excecoes.csproj" />
   </ItemGroup>
 
 </Project>

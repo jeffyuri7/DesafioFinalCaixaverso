@@ -46,6 +46,16 @@ public class MensagensDeExcecao
 
     public static string CLIENTE_NAO_ENCONTRADO => Recurso.GetString("CLIENTE_NAO_ENCONTRADO", cultura)!;
 
+    public static string CLIENTE_NOME_OBRIGATORIO => Recurso.GetString("CLIENTE_NOME_OBRIGATORIO", cultura)!;
+
+    public static string CLIENTE_EMAIL_OBRIGATORIO => Recurso.GetString("CLIENTE_EMAIL_OBRIGATORIO", cultura)!;
+
+    public static string CLIENTE_EMAIL_INVALIDO => Recurso.GetString("CLIENTE_EMAIL_INVALIDO", cultura)!;
+
+    public static string CLIENTE_SENHA_MINIMA => Recurso.GetString("CLIENTE_SENHA_MINIMA", cultura)!;
+
+    public static string CLIENTE_EMAIL_JA_CADASTRADO => Recurso.GetString("CLIENTE_EMAIL_JA_CADASTRADO", cultura)!;
+
     public static string TIPO_PRODUTO_OBRIGATORIO => Recurso.GetString("TIPO_PRODUTO_OBRIGATORIO", cultura)!;
 
     public static string PRAZO_SIMULACAO_INVALIDO => Recurso.GetString("PRAZO_SIMULACAO_INVALIDO", cultura)!;
@@ -55,4 +65,16 @@ public class MensagensDeExcecao
     public static string PRODUTO_NAO_ENCONTRADO => Recurso.GetString("PRODUTO_NAO_ENCONTRADO", cultura)!;
 
     public static string ERRO_DESCONHECIDO => Recurso.GetString("ERRO_DESCONHECIDO", cultura)!;
+
+    public static string QUESTIONARIO_HORIZONTE_INVALIDO => Recurso.GetString("QUESTIONARIO_HORIZONTE_INVALIDO", cultura)!;
+
+    public static string QUESTIONARIO_RENDA_INVALIDA => Recurso.GetString("QUESTIONARIO_RENDA_INVALIDA", cultura)!;
+
+    public static string QUESTIONARIO_PATRIMONIO_INVALIDO => Recurso.GetString("QUESTIONARIO_PATRIMONIO_INVALIDO", cultura)!;
+
+    public static string QUESTIONARIO_TOLERANCIA_INVALIDA => Recurso.GetString("QUESTIONARIO_TOLERANCIA_INVALIDA", cultura)!;
+
+    public static string SEGURANCA_CONFIG_HASH_NAO_INFORMADA => Recurso.GetString("SEGURANCA_CONFIG_HASH_NAO_INFORMADA", cultura)!;
+
+    public static string SEGURANCA_CHAVE_HASH_OBRIGATORIA => Recurso.GetString("SEGURANCA_CHAVE_HASH_OBRIGATORIA", cultura)!;
 }

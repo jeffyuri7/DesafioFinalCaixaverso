@@ -18,6 +18,21 @@
   <data name="CLIENTE_NAO_ENCONTRADO" xml:space="preserve">
     <value>Cliente não encontrado.</value>
   </data>
+  <data name="CLIENTE_NOME_OBRIGATORIO" xml:space="preserve">
+    <value>O nome do cliente é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_EMAIL_OBRIGATORIO" xml:space="preserve">
+    <value>O e-mail do cliente é obrigatório.</value>
+  </data>
+  <data name="CLIENTE_EMAIL_INVALIDO" xml:space="preserve">
+    <value>Informe um e-mail válido.</value>
+  </data>
+  <data name="CLIENTE_SENHA_MINIMA" xml:space="preserve">
+    <value>A senha deve possuir pelo menos 8 caracteres.</value>
+  </data>
+  <data name="CLIENTE_EMAIL_JA_CADASTRADO" xml:space="preserve">
+    <value>Já existe um cliente cadastrado com este e-mail.</value>
+  </data>
   <data name="TIPO_PRODUTO_OBRIGATORIO" xml:space="preserve">
     <value>O tipo de produto é obrigatório.</value>
   </data>
@@ -32,5 +47,23 @@
   </data>
   <data name="ERRO_DESCONHECIDO" xml:space="preserve">
     <value>Ocorreu um erro inesperado. Tente novamente mais tarde.</value>
+  </data>
+  <data name="QUESTIONARIO_HORIZONTE_INVALIDO" xml:space="preserve">
+    <value>O horizonte de investimento deve ser maior que zero.</value>
+  </data>
+  <data name="QUESTIONARIO_RENDA_INVALIDA" xml:space="preserve">
+    <value>A renda mensal deve ser maior ou igual a zero.</value>
+  </data>
+  <data name="QUESTIONARIO_PATRIMONIO_INVALIDO" xml:space="preserve">
+    <value>O patrimônio total deve ser maior ou igual a zero.</value>
+  </data>
+  <data name="QUESTIONARIO_TOLERANCIA_INVALIDA" xml:space="preserve">
+    <value>A tolerância a perdas deve estar entre 0% e 100%.</value>
+  </data>
+  <data name="SEGURANCA_CONFIG_HASH_NAO_INFORMADA" xml:space="preserve">
+    <value>A configuração do serviço de hash de senha não foi fornecida.</value>
+  </data>
+  <data name="SEGURANCA_CHAVE_HASH_OBRIGATORIA" xml:space="preserve">
+    <value>A chave de hash de senha é obrigatória. Defina o valor em Seguranca:HashSenha:Chave.</value>
   </data>
 </root>

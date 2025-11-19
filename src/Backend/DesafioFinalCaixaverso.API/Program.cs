@@ -2,6 +2,7 @@ using DesafioFinalCaixaverso.API.Filters;
 using DesafioFinalCaixaverso.API.Middlewares;
 using DesafioFinalCaixaverso.Aplicacao;
 using DesafioFinalCaixaverso.Infraestrutura;
+using DesafioFinalCaixaverso.Infraestrutura.Configuracoes;
 using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
 using DesafioFinalCaixaverso.Infraestrutura.Migracoes;
 using Microsoft.OpenApi.Models;
@@ -21,6 +22,8 @@ builder.Services.AddSwaggerGen(options =>
     options.EnableAnnotations();
 });
 
+
+builder.Services.Configure<HashSenhaConfiguracao>(builder.Configuration.GetSection(HashSenhaConfiguracao.Secao));
 
 builder.Services.RegistrarAplicacao();
 builder.Services.RegistrarInfraestrutura(builder.Configuration, builder.Environment);

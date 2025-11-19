@@ -1,4 +1,5 @@
-﻿using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Perfil;
+﻿using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Clientes;
+using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Perfil;
 using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
 using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Telemetria;
 using DesafioFinalCaixaverso.Aplicacao.Mapeamentos;
@@ -26,5 +27,7 @@ public static class InjecaoDeDependencia
         services.AddScoped<ICasoDeUsoConsultarPerfilCliente, CasoDeUsoConsultarPerfilCliente>();
         services.AddScoped<ICasoDeUsoListarProdutosRecomendados, CasoDeUsoListarProdutosRecomendados>();
         services.AddScoped<ICalculadoraPerfilInvestidor, CalculadoraPerfilInvestidor>();
+        services.AddScoped<ICasoDeUsoCadastrarCliente, CasoDeUsoCadastrarCliente>();
+        services.AddScoped<ICasoDeUsoResponderQuestionarioCliente, CasoDeUsoResponderQuestionarioCliente>();
     }
 }

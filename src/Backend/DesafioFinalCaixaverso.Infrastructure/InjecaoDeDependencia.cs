@@ -1,7 +1,9 @@
 ﻿using DesafioFinalCaixaverso.Dominio.Repositorios;
+using DesafioFinalCaixaverso.Dominio.Seguranca;
 using DesafioFinalCaixaverso.Infraestrutura.AcessoDados;
 using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
 using DesafioFinalCaixaverso.Infraestrutura.Repositorios;
+using DesafioFinalCaixaverso.Infraestrutura.Seguranca;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -54,5 +56,6 @@ public static class InjecaoDeDependencia
         services.AddScoped<ITelemetriaServicoRepositorio, TelemetriaServicoRepositorio>();
         services.AddScoped<IClientePerfilRepositorio, ClientePerfilRepositorio>();
         services.AddScoped<IQuestionarioInvestidorRepositorio, QuestionarioInvestidorRepositorio>();
+        services.AddScoped<IServicoHashSenha, ServicoHashSenha>();
     }
 }
