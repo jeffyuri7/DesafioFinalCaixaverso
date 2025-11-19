@@ -10,6 +10,8 @@ public class CaixaversoDbContext : DbContext
     public DbSet<Produto> Produtos { get; set; }
     public DbSet<Simulacao> Simulacoes { get; set; }
     public DbSet<TelemetriaServico> TelemetriaServicos { get; set; }
+    public DbSet<ClientePerfil> ClientePerfis { get; set; }
+    public DbSet<QuestionarioInvestidor> QuestionariosInvestidor { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +28,26 @@ public class CaixaversoDbContext : DbContext
             builder.Property(simulacao => simulacao.ValorInvestido).HasPrecision(18, 2);
             builder.Property(simulacao => simulacao.ValorFinal).HasPrecision(18, 2);
             builder.Property(simulacao => simulacao.RentabilidadeEfetiva).HasPrecision(18, 4);
+        });
+
+        modelBuilder.Entity<ClientePerfil>(builder =>
+        {
+            builder.HasIndex(perfil => perfil.ClienteId).IsUnique();
+            builder.Property(perfil => perfil.ValorMedioInvestido).HasPrecision(18, 2);
+            builder.Property(perfil => perfil.ValorTotalInvestido).HasPrecision(18, 2);
+            builder.Property(perfil => perfil.RentabilidadeMediaProduto).HasPrecision(18, 4);
+            builder.Property(perfil => perfil.PontuacaoComportamental).HasPrecision(5, 2);
+            builder.Property(perfil => perfil.PontuacaoQuestionario).HasPrecision(5, 2);
+            builder.Property(perfil => perfil.MetodoCalculo).HasMaxLength(100);
+            builder.Property(perfil => perfil.Observacoes).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<QuestionarioInvestidor>(builder =>
+        {
+            builder.HasIndex(questionario => questionario.ClienteId).IsUnique();
+            builder.Property(questionario => questionario.RendaMensal).HasPrecision(18, 2);
+            builder.Property(questionario => questionario.PatrimonioTotal).HasPrecision(18, 2);
+            builder.Property(questionario => questionario.ToleranciaPerdaPercentual).HasPrecision(5, 2);
         });
     }
 }

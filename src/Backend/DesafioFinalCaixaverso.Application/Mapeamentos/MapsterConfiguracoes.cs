@@ -1,3 +1,4 @@
+using DesafioFinalCaixaverso.Aplicacao.Servicos.Perfis;
 using DesafioFinalCaixaverso.Communications.Responses;
 using DesafioFinalCaixaverso.Dominio.Entidades;
 using Mapster;
@@ -18,5 +19,13 @@ public static class MapsterConfiguracoes
         TypeAdapterConfig<Simulacao, HistoricoSimulacaoJson>
             .NewConfig()
             .Map(destino => destino.ProdutoNome, origem => origem.Produto != null ? origem.Produto.Nome : string.Empty);
+
+        TypeAdapterConfig<Produto, ProdutoRecomendadoJson>
+            .NewConfig()
+            .Map(destino => destino.Risco, origem => origem.Risco.ToString());
+
+        TypeAdapterConfig<PerfilInvestidorResultado, PerfilClienteJson>
+            .NewConfig()
+            .Map(destino => destino.Perfil, origem => origem.Perfil.ToString());
     }
 }

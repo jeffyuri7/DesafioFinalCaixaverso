@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -67,5 +68,17 @@ public class SimulacaoRepositorio : ISimulacaoRepositorio
             .ToListAsync(cancellationToken);
 
         return agrupado.AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<Simulacao>> ListarPorClienteAsync(Guid clienteId, CancellationToken cancellationToken = default)
+    {
+        var simulacoes = await _dbContext.Simulacoes
+            .AsNoTracking()
+            .Include(simulacao => simulacao.Produto)
+            .Where(simulacao => simulacao.ClienteId == clienteId)
+            .OrderByDescending(simulacao => simulacao.DataSimulacao)
+            .ToListAsync(cancellationToken);
+
+        return simulacoes.AsReadOnly();
     }
 }

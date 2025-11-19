@@ -52,5 +52,7 @@ public static class InjecaoDeDependencia
         services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
         services.AddScoped<ISimulacaoRepositorio, SimulacaoRepositorio>();
         services.AddScoped<ITelemetriaServicoRepositorio, TelemetriaServicoRepositorio>();
+        services.AddScoped<IClientePerfilRepositorio, ClientePerfilRepositorio>();
+        services.AddScoped<IQuestionarioInvestidorRepositorio, QuestionarioInvestidorRepositorio>();
     }
 }

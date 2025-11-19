@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Dominio.Entidades;
+using DesafioFinalCaixaverso.Dominio.Enumeradores;
 using DesafioFinalCaixaverso.Dominio.Repositorios;
 
 namespace DesafioFinalCaixaverso.UseCases.UnitTests.Dubles;
@@ -33,5 +35,27 @@ public class ProdutoRepositorioFalso : IProdutoRepositorio
         lista.Add(produto);
         _produtos = lista;
         return Task.CompletedTask;
+    }
+
+    public Task<IReadOnlyCollection<Produto>> ListarPorPerfilAsync(PerfilInvestidor perfil, CancellationToken cancellationToken = default)
+    {
+        var produtosFiltrados = _produtos
+            .Where(produto => produto.Ativo && RiscoEhPermitido(perfil, produto.Risco))
+            .OrderBy(produto => produto.Risco)
+            .ThenBy(produto => produto.Nome)
+            .ToList()
+            .AsReadOnly();
+
+        return Task.FromResult<IReadOnlyCollection<Produto>>(produtosFiltrados);
+    }
+
+    private static bool RiscoEhPermitido(PerfilInvestidor perfilInvestidor, Risco riscoProduto)
+    {
+        return perfilInvestidor switch
+        {
+            PerfilInvestidor.Conservador => riscoProduto == Risco.Baixo,
+            PerfilInvestidor.Moderado => riscoProduto == Risco.Baixo || riscoProduto == Risco.Medio,
+            _ => true
+        };
     }
 }

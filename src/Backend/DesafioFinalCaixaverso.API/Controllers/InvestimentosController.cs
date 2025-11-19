@@ -1,4 +1,8 @@
-﻿using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
 using DesafioFinalCaixaverso.Communications.Requests;
 using DesafioFinalCaixaverso.Communications.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -49,5 +53,21 @@ public class InvestimentosController : ControllerBaseV1
     {
         var agrupado = await casoDeUsoConsultarSimulacoesPorProdutoDia.Executar();
         return Ok(agrupado);
+    }
+
+    [HttpGet("{clienteId:guid}")]
+    [SwaggerOperation(
+        Summary = "Consulta as simulações do cliente.",
+        Description = "Filtra o histórico retornando apenas os investimentos realizados pelo cliente informado.",
+        Tags = new[] { "Investimentos" })]
+    [ProducesResponseType(typeof(IEnumerable<HistoricoSimulacaoJson>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RespostaErroJson), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ListarInvestimentosPorCliente(
+        Guid clienteId,
+        [FromServices] ICasoDeUsoConsultarInvestimentosCliente casoDeUsoConsultarInvestimentosCliente,
+        CancellationToken cancellationToken = default)
+    {
+        var investimentos = await casoDeUsoConsultarInvestimentosCliente.Executar(clienteId, cancellationToken);
+        return Ok(investimentos);
     }
 }

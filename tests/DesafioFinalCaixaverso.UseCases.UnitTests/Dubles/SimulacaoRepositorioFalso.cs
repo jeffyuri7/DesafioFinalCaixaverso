@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Dominio.Consultas;
@@ -36,4 +38,15 @@ public class SimulacaoRepositorioFalso : ISimulacaoRepositorio
 
     public Task<IReadOnlyCollection<SimulacoesPorProdutoDiaResultado>> ListarAgrupadoPorProdutoEDiaAsync(CancellationToken cancellationToken = default)
         => Task.FromResult(_agrupado);
+
+    public Task<IReadOnlyCollection<SimulacaoDominio>> ListarPorClienteAsync(Guid clienteId, CancellationToken cancellationToken = default)
+    {
+        var filtrado = _historico
+            .Where(simulacao => simulacao.ClienteId == clienteId)
+            .OrderByDescending(simulacao => simulacao.DataSimulacao)
+            .ToList()
+            .AsReadOnly();
+
+        return Task.FromResult<IReadOnlyCollection<SimulacaoDominio>>(filtrado);
+    }
 }
