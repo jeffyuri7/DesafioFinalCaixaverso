@@ -9,7 +9,7 @@ public class Versao000004 : ForwardOnlyMigration
     {
         Create.Table("TelemetriaServicos")
             .WithColumn("Id").AsGuid().PrimaryKey().NotNullable()
-            .WithColumn("Servico").AsString(100).NotNullable()
+            .WithColumn("Servico").AsString(300).NotNullable()
             .WithColumn("QuantidadeChamadas").AsInt32().NotNullable()
             .WithColumn("UltimaChamada").AsDateTime().NotNullable();
 

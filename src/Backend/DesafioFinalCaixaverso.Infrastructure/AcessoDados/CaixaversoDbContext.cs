@@ -30,6 +30,11 @@ public class CaixaversoDbContext : DbContext
             builder.Property(simulacao => simulacao.RentabilidadeEfetiva).HasPrecision(18, 4);
         });
 
+        modelBuilder.Entity<TelemetriaServico>(builder =>
+        {
+            builder.Property(telemetria => telemetria.Servico).HasMaxLength(300);
+        });
+
         modelBuilder.Entity<ClientePerfil>(builder =>
         {
             builder.HasIndex(perfil => perfil.ClienteId).IsUnique();

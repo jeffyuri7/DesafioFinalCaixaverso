@@ -34,8 +34,11 @@ public class SimulacaoRepositorio : ISimulacaoRepositorio
     {
         var query = _dbContext.Simulacoes
             .AsNoTracking()
-            .Include(simulacao => simulacao.Produto)
-            .Where(simulacao => simulacao.Produto != null);
+            .Join(
+                _dbContext.Produtos.AsNoTracking(),
+                simulacao => simulacao.ProdutoId,
+                produto => produto.Id,
+                (simulacao, produto) => new { simulacao, produto });
 
         if (_dbContext.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
         {
@@ -43,12 +46,12 @@ public class SimulacaoRepositorio : ISimulacaoRepositorio
 
             var agrupadoMemoria = query
                 .AsEnumerable()
-                .GroupBy(simulacao => new { Produto = simulacao.Produto!.Nome, Dia = simulacao.DataSimulacao.Date })
+                .GroupBy(item => new { Produto = item.produto.Nome, Dia = item.simulacao.DataSimulacao.Date })
                 .Select(grupo => new SimulacoesPorProdutoDiaResultado(
                     grupo.Key.Produto,
                     grupo.Key.Dia,
                     grupo.Count(),
-                    grupo.Sum(simulacao => simulacao.ValorInvestido)))
+                    grupo.Sum(item => item.simulacao.ValorInvestido)))
                 .OrderByDescending(resultado => resultado.Dia)
                 .ThenBy(resultado => resultado.Produto)
                 .ToList();
@@ -57,12 +60,12 @@ public class SimulacaoRepositorio : ISimulacaoRepositorio
         }
 
         var agrupado = await query
-            .GroupBy(simulacao => new { Produto = simulacao.Produto!.Nome, Dia = simulacao.DataSimulacao.Date })
+            .GroupBy(item => new { Produto = item.produto.Nome, Dia = item.simulacao.DataSimulacao.Date })
             .Select(grupo => new SimulacoesPorProdutoDiaResultado(
                 grupo.Key.Produto,
                 grupo.Key.Dia,
                 grupo.Count(),
-                grupo.Sum(simulacao => simulacao.ValorInvestido)))
+                grupo.Sum(item => item.simulacao.ValorInvestido)))
             .OrderByDescending(resultado => resultado.Dia)
             .ThenBy(resultado => resultado.Produto)
             .ToListAsync(cancellationToken);

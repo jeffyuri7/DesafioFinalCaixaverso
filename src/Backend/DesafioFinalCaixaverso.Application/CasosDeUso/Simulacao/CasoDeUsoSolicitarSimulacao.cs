@@ -84,7 +84,7 @@ public class CasoDeUsoSolicitarSimulacao : ICasoDeUsoSolicitarSimulacao
         var rentabilidadeEfetiva = produtoSelecionado.Rentabilidade * prazoAnos;
         var valorFinal = requisicao.Valor * (1 + rentabilidadeEfetiva);
 
-        var dadosSimulacao = new
+        return new SimulacaoDominio
         {
             Id = Guid.NewGuid(),
             ClienteId = requisicao.ClienteId,
@@ -95,8 +95,6 @@ public class CasoDeUsoSolicitarSimulacao : ICasoDeUsoSolicitarSimulacao
             PrazoMeses = requisicao.PrazoMeses,
             DataSimulacao = DateTime.UtcNow
         };
-
-        return dadosSimulacao.Adapt<SimulacaoDominio>();
     }
 
     private static async Task Validar(RequisicaoSimulacaoJson requisicao)

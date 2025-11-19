@@ -7,7 +7,7 @@ public class Versao000003 : ForwardOnlyMigration
 {
     public override void Up()
     {
-        Create.Table("Simulacao")
+    Create.Table("Simulacoes")
             .WithColumn("Id").AsGuid().PrimaryKey().NotNullable()
             .WithColumn("ClienteId").AsGuid().NotNullable()
             .WithColumn("ProdutoId").AsGuid().NotNullable()

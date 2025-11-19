@@ -12,6 +12,7 @@ namespace DesafioFinalCaixaverso.Infraestrutura.Repositorios;
 
 public class TelemetriaServicoRepositorio : ITelemetriaServicoRepositorio
 {
+    private const int TamanhoMaximoNomeServico = 300;
     private readonly CaixaversoDbContext _dbContext;
 
     public TelemetriaServicoRepositorio(CaixaversoDbContext dbContext) => _dbContext = dbContext;
@@ -22,6 +23,8 @@ public class TelemetriaServicoRepositorio : ITelemetriaServicoRepositorio
             return;
 
         var servicoNormalizado = servico.Trim();
+        if (servicoNormalizado.Length > TamanhoMaximoNomeServico)
+            servicoNormalizado = servicoNormalizado[..TamanhoMaximoNomeServico];
 
         var registro = await _dbContext.TelemetriaServicos
             .FirstOrDefaultAsync(t => t.Servico == servicoNormalizado, cancellationToken);

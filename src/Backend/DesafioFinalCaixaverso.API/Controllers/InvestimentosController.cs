@@ -26,7 +26,10 @@ public class InvestimentosController : ControllerBaseV1
     {
         var resposta = await casoDeUsoSolicitarSimulacao.Executar(requisicao);
 
-        return Created(string.Empty, resposta);
+        return CreatedAtAction(
+            nameof(ListarInvestimentosPorCliente),
+            new { clienteId = requisicao.ClienteId },
+            resposta);
     }
 
     [HttpGet("simulacoes")]

@@ -10,7 +10,6 @@ public class Versao000006 : ForwardOnlyMigration
     public override void Up()
     {
         CriarTabelaQuestionario();
-        AjustarTabelaPerfil();
     }
 
     private void CriarTabelaQuestionario()
@@ -32,18 +31,9 @@ public class Versao000006 : ForwardOnlyMigration
             .OnTable(QuestionarioTabela)
             .OnColumn("ClienteId").Ascending().WithOptions().Unique();
 
-        Create.ForeignKey("FK_QuestionariosInvestidor_Cliente")
+        Create.ForeignKey("FK_QuestionariosInvestidor_Clientes")
             .FromTable(QuestionarioTabela).ForeignColumn("ClienteId")
-            .ToTable("Cliente").PrimaryColumn("Id");
+            .ToTable("Clientes").PrimaryColumn("Id");
     }
 
-    private void AjustarTabelaPerfil()
-    {
-        Alter.Table("ClientePerfis")
-            .AddColumn("PontuacaoComportamental").AsDecimal(5, 2).NotNullable().WithDefaultValue(0)
-            .AddColumn("PontuacaoQuestionario").AsDecimal(5, 2).NotNullable().WithDefaultValue(0)
-            .AddColumn("PermiteRecomendacao").AsBoolean().NotNullable().WithDefaultValue(false)
-            .AddColumn("MetodoCalculo").AsString(100).NotNullable().WithDefaultValue("motor_v2")
-            .AddColumn("Observacoes").AsString(500).NotNullable().WithDefaultValue(string.Empty);
-    }
 }
