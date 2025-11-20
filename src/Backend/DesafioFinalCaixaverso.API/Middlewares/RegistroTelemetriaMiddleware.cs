@@ -45,16 +45,26 @@ public class RegistroTelemetriaMiddleware
                 if (segmentos[0].StartsWith("v", StringComparison.OrdinalIgnoreCase))
                     segmentos = segmentos.Skip(1).ToArray();
 
+                segmentos = segmentos
+                    .Where(segmento => !EhIdentificadorCliente(segmento))
+                    .ToArray();
+
                 if (segmentos.Length > 0)
                     return string.Join('-', segmentos).ToLowerInvariant();
             }
-
-            return path.Trim('/').Replace('/', '-').ToLowerInvariant();
         }
 
         if (!string.IsNullOrWhiteSpace(displayName))
             return displayName.Trim();
 
         return "servico-desconhecido";
+    }
+
+    private static bool EhIdentificadorCliente(string segmento)
+    {
+        if (string.IsNullOrWhiteSpace(segmento))
+            return false;
+
+        return Guid.TryParse(segmento, out _);
     }
 }

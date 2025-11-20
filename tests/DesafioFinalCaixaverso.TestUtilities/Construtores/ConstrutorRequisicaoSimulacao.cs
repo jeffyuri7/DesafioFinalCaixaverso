@@ -38,7 +38,16 @@ public class ConstrutorRequisicaoSimulacao
 
     public ConstrutorRequisicaoSimulacao ComTipoProduto(string tipoProduto)
     {
-        _requisicao.TipoProduto = tipoProduto == string.Empty ? string.Empty : (string.IsNullOrWhiteSpace(tipoProduto) ? "CDB" : tipoProduto.Trim().ToUpper());
+        string valorTipoProduto;
+
+        if (tipoProduto == string.Empty)
+            valorTipoProduto = string.Empty;
+        else if (string.IsNullOrWhiteSpace(tipoProduto))
+            valorTipoProduto = "CDB";
+        else
+            valorTipoProduto = tipoProduto.Trim().ToUpper();
+
+        _requisicao.TipoProduto = valorTipoProduto;
         return this;
     }
 

@@ -71,7 +71,7 @@ public class CalculadoraPerfilInvestidorTestes
         resultado.Observacoes.ShouldContain("Questionário e histórico indisponíveis");
     }
 
-    private static IReadOnlyCollection<SimulacaoEntidade> CriarSimulacoesComportamentoRobusto(Guid clienteId)
+    private static List<SimulacaoEntidade> CriarSimulacoesComportamentoRobusto(Guid clienteId)
     {
         var produto = new ConstrutorProduto()
             .ComRentabilidade(0.12m)

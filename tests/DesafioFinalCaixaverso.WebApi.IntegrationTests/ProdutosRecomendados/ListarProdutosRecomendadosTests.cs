@@ -19,6 +19,7 @@ public class ListarProdutosRecomendadosTests : DesafioFinalCaixaversoClassFixtur
     {
         PropertyNameCaseInsensitive = true
     };
+    private static readonly string[] ProdutosConservadoresOrdenados = { "CDB Liquidez Diária", "Tesouro IPCA 2030" };
 
     public ListarProdutosRecomendadosTests(CustomWebApplicationFactory factory) : base(factory)
     {
@@ -69,7 +70,7 @@ public class ListarProdutosRecomendadosTests : DesafioFinalCaixaversoClassFixtur
         produtos[0].Risco.ShouldBe("Baixo");
     produtos[1].Nome.ShouldBe("Tesouro IPCA 2030");
     produtos[1].Risco.ShouldBe("Baixo");
-    produtos.Select(p => p.Nome).ShouldBe(new[] { "CDB Liquidez Diária", "Tesouro IPCA 2030" });
+    produtos.Select(p => p.Nome).ShouldBe(ProdutosConservadoresOrdenados);
     }
 
     [Fact]

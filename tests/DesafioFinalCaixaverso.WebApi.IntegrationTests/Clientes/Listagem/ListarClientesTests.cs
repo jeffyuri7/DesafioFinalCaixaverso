@@ -18,6 +18,7 @@ public class ListarClientesTests : DesafioFinalCaixaversoClassFixture
     {
         PropertyNameCaseInsensitive = true
     };
+    private static readonly string[] ClientesOrdenadosPorNome = { "Ana Lira", "Bruno Dias", "Carlos Souza" };
 
     public ListarClientesTests(CustomWebApplicationFactory factory) : base(factory)
     {
@@ -54,7 +55,7 @@ public class ListarClientesTests : DesafioFinalCaixaversoClassFixture
         var clientes = JsonSerializer.Deserialize<List<ClienteCadastradoJson>>(payload, JsonOptions);
         clientes.ShouldNotBeNull();
         clientes!.Count.ShouldBe(3);
-        clientes.Select(cliente => cliente.Nome).ShouldBe(new[] { "Ana Lira", "Bruno Dias", "Carlos Souza" });
+    clientes.Select(cliente => cliente.Nome).ShouldBe(ClientesOrdenadosPorNome);
         clientes.First().ClienteId.ShouldBe(clienteAna.Id);
     }
 }

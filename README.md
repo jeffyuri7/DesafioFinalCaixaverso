@@ -26,13 +26,22 @@ dotnet test DesafioFinalCaixaverso.slnx
 	```
 A API estará disponível em `http://localhost:8080/swagger`.
 
-### Endpoints 
-- `POST v1/investimentos/simular-investimento`
-- `GET v1/investimentos/simulacoes`
-- `GET v1/investimentos/simulacoes/por-produto-dia`
-- `GET v1/telemetria`
-- `POST v1/clientes`
-- `POST v1/clientes/{clienteId}/questionario`
+### Endpoints principais
+- `POST v1/investimentos/simular-investimento` — calcula e persiste uma nova simulação (requer Bearer Token).
+- `GET v1/investimentos/simulacoes` — lista o histórico completo de simulações ordenado pela data.
+- `GET v1/investimentos/simulacoes/por-produto-dia` — agrega volume diário por produto para dashboards.
+- `GET v1/investimentos/{clienteId}` — retorna apenas os investimentos do cliente autenticado.
+- `GET v1/telemetria` — exibe consumo dos serviços e período corrente.
+- `GET v1/perfil-risco/{clienteId}` — resumo textual do perfil com descrição amigável.
+- `GET v1/perfil-risco-completo/{clienteId}` — retorna os detalhes usados na classificação e persiste o histórico.
+- `GET v1/produtos-recomendados/{perfil}` — recomenda produtos compatíveis com o perfil informado.
+- `POST v1/login` — autentica o cliente e gera o token JWT utilizado nos demais endpoints protegidos.
+- `GET v1/clientes` — consulta os clientes cadastrados (apenas rotas administradas).
+- `GET v1/clientes/{clienteId}` — consulta detalhada do cliente.
+- `POST v1/clientes` — cadastra um novo cliente aplicando hash seguro.
+- `PUT v1/clientes/{clienteId}` — atualiza dados básicos e senha opcionalmente.
+- `DELETE v1/clientes/{clienteId}` — remove o cliente e relações.
+- `POST v1/clientes/{clienteId}/questionario` — registra ou atualiza o questionário suitability.
 
 ## Como responder o questionário do investidor
 O endpoint `POST v1/clientes/{clienteId}/questionario` aceita um corpo JSON com enumerações representadas por inteiros. Utilize a tabela abaixo ao preencher os campos enumerados:

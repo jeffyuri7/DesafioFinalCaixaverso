@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DesafioFinalCaixaverso.Infraestrutura.Migracoes;
 
-public class BancoDeDadosMigracao
+public static class BancoDeDadosMigracao
 {
     public static void Migracao(string connectionString, IServiceProvider serviceProvider)
     {

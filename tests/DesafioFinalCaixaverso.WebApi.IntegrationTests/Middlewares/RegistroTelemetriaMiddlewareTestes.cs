@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +38,21 @@ public class RegistroTelemetriaMiddlewareTestes
         await middleware.InvokeAsync(context, registrador);
 
         registrador.ServicosRegistrados.ShouldContain(entry => entry.Servico == "telemetria");
+    }
+
+    [Fact]
+    public async Task Deve_remover_clientId_do_nome_do_servico()
+    {
+        var registrador = new RegistradorTelemetriaServicosFalso();
+        var middleware = new RegistroTelemetriaMiddleware(_ => Task.CompletedTask);
+        var context = new DefaultHttpContext();
+        var clienteId = Guid.NewGuid();
+        context.Request.Path = $"/v1/clientes/{clienteId}/investimentos";
+        context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, new EndpointMetadataCollection(), null));
+
+        await middleware.InvokeAsync(context, registrador);
+
+        registrador.ServicosRegistrados.ShouldContain(entry => entry.Servico == "clientes-investimentos");
     }
 
     private sealed class RegistradorTelemetriaServicosFalso : IRegistradorTelemetriaServicos

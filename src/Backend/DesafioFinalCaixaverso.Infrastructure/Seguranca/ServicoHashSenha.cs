@@ -27,8 +27,7 @@ public class ServicoHashSenha : IServicoHashSenha
     {
         var texto = senha + _chave;
         var bytes = Encoding.UTF8.GetBytes(texto);
-        using var sha256 = SHA256.Create();
-        var hashBytes = sha256.ComputeHash(bytes);
+        var hashBytes = SHA256.HashData(bytes);
         return Convert.ToHexString(hashBytes);
     }
 

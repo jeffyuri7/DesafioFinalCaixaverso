@@ -97,7 +97,7 @@ public class CalculadoraPerfilInvestidor : ICalculadoraPerfilInvestidor
             .Where(simulacao => simulacao.DataSimulacao >= periodoAnalise)
             .ToList();
 
-        if (!simulacoesPeriodo.Any())
+    if (simulacoesPeriodo.Count == 0)
         {
             return DimensaoComportamental.Indisponivel();
         }
@@ -112,11 +112,11 @@ public class CalculadoraPerfilInvestidor : ICalculadoraPerfilInvestidor
             .Select(simulacao => simulacao.Produto!)
             .ToList();
 
-        var rentabilidadeMedia = produtos.Any()
+        var rentabilidadeMedia = produtos.Count > 0
             ? decimal.Round(produtos.Average(produto => produto.Rentabilidade), 4, MidpointRounding.AwayFromZero)
             : 0;
 
-        var liquidezMediaDias = produtos.Any()
+        var liquidezMediaDias = produtos.Count > 0
             ? (int)Math.Round(produtos.Average(produto => produto.LiquidezDias), MidpointRounding.AwayFromZero)
             : 0;
 

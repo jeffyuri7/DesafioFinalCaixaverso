@@ -10,11 +10,17 @@ public class Versao000004 : ForwardOnlyMigration
         Create.Table("TelemetriaServicos")
             .WithColumn("Id").AsGuid().PrimaryKey().NotNullable()
             .WithColumn("Servico").AsString(300).NotNullable()
+            .WithColumn("AnoReferencia").AsInt32().NotNullable()
+            .WithColumn("MesReferencia").AsInt32().NotNullable()
             .WithColumn("QuantidadeChamadas").AsInt32().NotNullable()
+            .WithColumn("TempoTotalRespostaMs").AsInt64().NotNullable().WithDefaultValue(0)
             .WithColumn("UltimaChamada").AsDateTime().NotNullable();
 
-        Create.Index("IX_TelemetriaServicos_Servico")
+        Create.Index("IX_TelemetriaServicos_Servico_Ano_Mes")
             .OnTable("TelemetriaServicos")
-            .OnColumn("Servico").Ascending().WithOptions().Unique();
+            .OnColumn("Servico").Ascending()
+            .OnColumn("AnoReferencia").Ascending()
+            .OnColumn("MesReferencia").Ascending()
+            .WithOptions().Unique();
     }
 }
