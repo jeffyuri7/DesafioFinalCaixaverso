@@ -77,4 +77,16 @@ public class MensagensDeExcecao
     public static string SEGURANCA_CONFIG_HASH_NAO_INFORMADA => Recurso.GetString("SEGURANCA_CONFIG_HASH_NAO_INFORMADA", cultura)!;
 
     public static string SEGURANCA_CHAVE_HASH_OBRIGATORIA => Recurso.GetString("SEGURANCA_CHAVE_HASH_OBRIGATORIA", cultura)!;
+
+    public static string SEGURANCA_CONFIG_JWT_NAO_INFORMADA => Recurso.GetString("SEGURANCA_CONFIG_JWT_NAO_INFORMADA", cultura)!;
+
+    public static string SEGURANCA_CHAVE_JWT_OBRIGATORIA => Recurso.GetString("SEGURANCA_CHAVE_JWT_OBRIGATORIA", cultura)!;
+
+    public static string SEGURANCA_EMISSOR_JWT_OBRIGATORIO => Recurso.GetString("SEGURANCA_EMISSOR_JWT_OBRIGATORIO", cultura)!;
+
+    public static string SEGURANCA_AUDIENCIA_JWT_OBRIGATORIA => Recurso.GetString("SEGURANCA_AUDIENCIA_JWT_OBRIGATORIA", cultura)!;
+
+    public static string SEGURANCA_EXPIRACAO_JWT_INVALIDA => Recurso.GetString("SEGURANCA_EXPIRACAO_JWT_INVALIDA", cultura)!;
+
+    public static string AUTENTICACAO_CREDENCIAIS_INVALIDAS => Recurso.GetString("AUTENTICACAO_CREDENCIAIS_INVALIDAS", cultura)!;
 }

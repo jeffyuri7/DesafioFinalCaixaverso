@@ -1,3 +1,4 @@
+using System.Text;
 using DesafioFinalCaixaverso.API.Filters;
 using DesafioFinalCaixaverso.API.Middlewares;
 using DesafioFinalCaixaverso.Aplicacao;
@@ -5,6 +6,8 @@ using DesafioFinalCaixaverso.Infraestrutura;
 using DesafioFinalCaixaverso.Infraestrutura.Configuracoes;
 using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
 using DesafioFinalCaixaverso.Infraestrutura.Migracoes;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,10 +23,61 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Endpoints de simulação de investimentos, consultas históricas e telemetria."
     });
     options.EnableAnnotations();
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Insira o token JWT no formato 'Bearer {token}'.",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 
 builder.Services.Configure<HashSenhaConfiguracao>(builder.Configuration.GetSection(HashSenhaConfiguracao.Secao));
+builder.Services.Configure<JwtTokenConfiguracao>(builder.Configuration.GetSection(JwtTokenConfiguracao.Secao));
+
+var jwtConfiguracao = builder.Configuration
+    .GetSection(JwtTokenConfiguracao.Secao)
+    .Get<JwtTokenConfiguracao>()
+    ?? throw new InvalidOperationException("Configuração de JWT não encontrada. Defina Seguranca:Jwt no appsettings.");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtConfiguracao.Emissor,
+        ValidAudience = jwtConfiguracao.Audiencia,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguracao.Chave)),
+        ClockSkew = TimeSpan.FromSeconds(30)
+    };
+});
+
+builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.RegistrarAplicacao();
 builder.Services.RegistrarInfraestrutura(builder.Configuration, builder.Environment);
@@ -41,6 +95,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<RegistroTelemetriaMiddleware>();

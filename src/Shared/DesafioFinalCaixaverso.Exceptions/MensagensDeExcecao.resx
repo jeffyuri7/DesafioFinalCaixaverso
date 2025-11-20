@@ -66,4 +66,22 @@
   <data name="SEGURANCA_CHAVE_HASH_OBRIGATORIA" xml:space="preserve">
     <value>A chave de hash de senha é obrigatória. Defina o valor em Seguranca:HashSenha:Chave.</value>
   </data>
+  <data name="SEGURANCA_CONFIG_JWT_NAO_INFORMADA" xml:space="preserve">
+    <value>A configuração do serviço de JWT não foi fornecida.</value>
+  </data>
+  <data name="SEGURANCA_CHAVE_JWT_OBRIGATORIA" xml:space="preserve">
+    <value>A chave de assinatura do JWT é obrigatória. Defina o valor em Seguranca:Jwt:Chave.</value>
+  </data>
+  <data name="SEGURANCA_EMISSOR_JWT_OBRIGATORIO" xml:space="preserve">
+    <value>O emissor (Issuer) do JWT é obrigatório. Defina o valor em Seguranca:Jwt:Emissor.</value>
+  </data>
+  <data name="SEGURANCA_AUDIENCIA_JWT_OBRIGATORIA" xml:space="preserve">
+    <value>A audiência (Audience) do JWT é obrigatória. Defina o valor em Seguranca:Jwt:Audiencia.</value>
+  </data>
+  <data name="SEGURANCA_EXPIRACAO_JWT_INVALIDA" xml:space="preserve">
+    <value>O tempo de expiração do JWT deve ser maior que zero.</value>
+  </data>
+  <data name="AUTENTICACAO_CREDENCIAIS_INVALIDAS" xml:space="preserve">
+    <value>E-mail ou senha inválidos.</value>
+  </data>
 </root>

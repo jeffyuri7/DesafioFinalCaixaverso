@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Perfil;
 using DesafioFinalCaixaverso.Communications.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -13,6 +14,7 @@ namespace DesafioFinalCaixaverso.API.Controllers;
 public class PerfilRiscoController : ControllerBase
 {
     [HttpGet("{clienteId:guid}")]
+    [Authorize]
     [SwaggerOperation(
         Summary = "Consulta o perfil de risco calculado para o cliente.",
         Description = "Analisa o histórico de simulações e retorna a pontuação consolidada do investidor.",

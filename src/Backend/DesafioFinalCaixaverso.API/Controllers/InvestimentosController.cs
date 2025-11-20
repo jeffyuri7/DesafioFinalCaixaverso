@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
 using DesafioFinalCaixaverso.Communications.Requests;
 using DesafioFinalCaixaverso.Communications.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -13,6 +14,7 @@ namespace DesafioFinalCaixaverso.API.Controllers;
 public class InvestimentosController : ControllerBaseV1
 {
     [HttpPost("simular-investimento")]
+    [Authorize]
     [SwaggerOperation(
         Summary = "Solicita uma nova simulação.",
         Description = "Valida o cliente, seleciona o produto compatível e retorna o resultado da simulação.",
@@ -59,6 +61,7 @@ public class InvestimentosController : ControllerBaseV1
     }
 
     [HttpGet("{clienteId:guid}")]
+    [Authorize]
     [SwaggerOperation(
         Summary = "Consulta as simulações do cliente.",
         Description = "Filtra o histórico retornando apenas os investimentos realizados pelo cliente informado.",

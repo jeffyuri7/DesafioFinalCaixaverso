@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Clientes;
 using DesafioFinalCaixaverso.Communications.Requests;
 using DesafioFinalCaixaverso.Communications.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -28,6 +29,7 @@ public class ClientesController : ControllerBaseV1
     }
 
     [HttpPost("{clienteId:guid}/questionario")]
+    [Authorize]
     [SwaggerOperation(
         Summary = "Registra ou atualiza o questionário do cliente.",
         Description = """

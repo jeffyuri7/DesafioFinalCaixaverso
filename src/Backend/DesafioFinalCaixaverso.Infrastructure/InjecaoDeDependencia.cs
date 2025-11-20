@@ -57,5 +57,6 @@ public static class InjecaoDeDependencia
         services.AddScoped<IClientePerfilRepositorio, ClientePerfilRepositorio>();
         services.AddScoped<IQuestionarioInvestidorRepositorio, QuestionarioInvestidorRepositorio>();
         services.AddScoped<IServicoHashSenha, ServicoHashSenha>();
+        services.AddScoped<IGeradorTokenAcesso, GeradorTokenJwt>();
     }
 }
