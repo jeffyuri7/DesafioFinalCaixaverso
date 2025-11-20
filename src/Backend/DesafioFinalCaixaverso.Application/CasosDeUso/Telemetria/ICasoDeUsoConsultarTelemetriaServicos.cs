@@ -7,5 +7,5 @@ namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Telemetria;
 
 public interface ICasoDeUsoConsultarTelemetriaServicos
 {
-    Task<IReadOnlyCollection<TelemetriaServicosJson>> Executar(CancellationToken cancellationToken = default);
+    Task<TelemetriaResumoJson> Executar(CancellationToken cancellationToken = default);
 }

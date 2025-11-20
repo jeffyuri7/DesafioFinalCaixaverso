@@ -1,3 +1,6 @@
+using System;
+using System.Diagnostics;
+using System.Linq;
 using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Telemetria;
 using Microsoft.AspNetCore.Http;
 
@@ -11,22 +14,47 @@ public class RegistroTelemetriaMiddleware
 
     public async Task InvokeAsync(HttpContext context, IRegistradorTelemetriaServicos registradorTelemetriaServicos)
     {
-        await _next(context);
+        var relogio = Stopwatch.StartNew();
 
-        var endpoint = context.GetEndpoint();
-        if (endpoint is null)
-            return;
+        try
+        {
+            await _next(context);
+        }
+        finally
+        {
+            relogio.Stop();
 
-        var servico = NormalizarNomeServico(context, endpoint.DisplayName);
-        await registradorTelemetriaServicos.RegistrarAsync(servico, context.RequestAborted);
+            var endpoint = context.GetEndpoint();
+            if (endpoint is not null)
+            {
+                var servico = NormalizarNomeServico(context, endpoint.DisplayName);
+                var tempoResposta = relogio.ElapsedMilliseconds;
+                await registradorTelemetriaServicos.RegistrarAsync(servico, tempoResposta, context.RequestAborted);
+            }
+        }
     }
 
     private static string NormalizarNomeServico(HttpContext context, string? displayName)
     {
+        var path = context.Request.Path.HasValue ? context.Request.Path.Value : string.Empty;
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            var segmentos = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (segmentos.Length > 0)
+            {
+                if (segmentos[0].StartsWith("v", StringComparison.OrdinalIgnoreCase))
+                    segmentos = segmentos.Skip(1).ToArray();
+
+                if (segmentos.Length > 0)
+                    return string.Join('-', segmentos).ToLowerInvariant();
+            }
+
+            return path.Trim('/').Replace('/', '-').ToLowerInvariant();
+        }
+
         if (!string.IsNullOrWhiteSpace(displayName))
             return displayName.Trim();
 
-        var path = context.Request.Path.HasValue ? context.Request.Path.Value : "/desconhecido";
-        return path!.Trim('/').Replace('/', ':');
+        return "servico-desconhecido";
     }
 }

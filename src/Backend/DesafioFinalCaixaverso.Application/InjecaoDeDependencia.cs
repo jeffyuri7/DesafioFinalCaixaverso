@@ -30,6 +30,10 @@ public static class InjecaoDeDependencia
         services.AddScoped<ICalculadoraPerfilInvestidor, CalculadoraPerfilInvestidor>();
         services.AddScoped<ICasoDeUsoCadastrarCliente, CasoDeUsoCadastrarCliente>();
         services.AddScoped<ICasoDeUsoResponderQuestionarioCliente, CasoDeUsoResponderQuestionarioCliente>();
+        services.AddScoped<ICasoDeUsoListarClientes, CasoDeUsoListarClientes>();
+        services.AddScoped<ICasoDeUsoConsultarCliente, CasoDeUsoConsultarCliente>();
+        services.AddScoped<ICasoDeUsoAtualizarCliente, CasoDeUsoAtualizarCliente>();
+        services.AddScoped<ICasoDeUsoExcluirCliente, CasoDeUsoExcluirCliente>();
         services.AddScoped<ICasoDeUsoLoginCliente, CasoDeUsoLoginCliente>();
     }
 }

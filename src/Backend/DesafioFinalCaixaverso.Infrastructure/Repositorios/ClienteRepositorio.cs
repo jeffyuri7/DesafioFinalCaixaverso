@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Dominio.Entidades;
@@ -40,5 +42,28 @@ public class ClienteRepositorio : IClienteRepositorio
     public async Task AdicionarAsync(Cliente cliente, CancellationToken cancellationToken = default)
     {
         await _dbContext.Clientes.AddAsync(cliente, cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<Cliente>> ListarAsync(CancellationToken cancellationToken = default)
+    {
+        var clientes = await _dbContext
+            .Clientes
+            .AsNoTracking()
+            .OrderBy(cliente => cliente.Nome)
+            .ToListAsync(cancellationToken);
+
+        return clientes;
+    }
+
+    public Task AtualizarAsync(Cliente cliente, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Clientes.Update(cliente);
+        return Task.CompletedTask;
+    }
+
+    public Task RemoverAsync(Cliente cliente, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Clientes.Remove(cliente);
+        return Task.CompletedTask;
     }
 }

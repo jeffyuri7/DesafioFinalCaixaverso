@@ -8,6 +8,7 @@ using DesafioFinalCaixaverso.Infraestrutura.Extensoes;
 using DesafioFinalCaixaverso.Infraestrutura.Migracoes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +27,7 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Description = "Insira o token JWT no formato 'Bearer {token}'.",
+        Description = "Insira apenas o token JWT.",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
@@ -45,6 +46,19 @@ builder.Services.AddSwaggerGen(options =>
             },
             Array.Empty<string>()
         }
+    });
+    options.MapType<Guid>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "uuid",
+        Example = new OpenApiString(string.Empty)
+    });
+    options.MapType<Guid?>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "uuid",
+        Nullable = true,
+        Example = new OpenApiString(string.Empty)
     });
 });
 

@@ -5,5 +5,5 @@ namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Telemetria;
 
 public interface IRegistradorTelemetriaServicos
 {
-    Task RegistrarAsync(string servico, CancellationToken cancellationToken = default);
+    Task RegistrarAsync(string servico, long tempoRespostaMs, CancellationToken cancellationToken = default);
 }

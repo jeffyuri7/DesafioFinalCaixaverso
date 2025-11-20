@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DesafioFinalCaixaverso.Communications.Requests;
 using DesafioFinalCaixaverso.Communications.Responses;
@@ -38,39 +39,54 @@ public class CasoDeUsoSolicitarSimulacao : ICasoDeUsoSolicitarSimulacao
         if (!clienteExiste)
             throw new NaoEncontradoException(MensagensDeExcecao.CLIENTE_NAO_ENCONTRADO);
 
-        var produtoSelecionado = await ObterProdutoCompativel(requisicao);
+        var produtosCompativeis = await ObterProdutosCompativeis(requisicao);
 
-        var simulacao = CriarSimulacao(requisicao, produtoSelecionado);
+        var simulacoes = new List<(Produto produto, SimulacaoDominio simulacao)>();
+        foreach (var produto in produtosCompativeis)
+        {
+            var simulacao = CriarSimulacao(requisicao, produto);
+            simulacoes.Add((produto, simulacao));
+            await _simulacaoRepositorio.AdicionarAsync(simulacao);
+        }
 
-        await _simulacaoRepositorio.AdicionarAsync(simulacao);
         await _unidadeDeTrabalho.Commit();
 
-        return new RespostaSimulacaoJson
+        var resposta = new RespostaSimulacaoJson
         {
-            ProdutoValidado = produtoSelecionado.Adapt<ProdutoSimuladoJson>(),
-            ResultadoSimulacao = simulacao.Adapt<ResultadoSimulacaoJson>(),
-            DataSimulacao = simulacao.DataSimulacao
+            Simulacoes = simulacoes
+                .Select(par => new SimulacaoGeradaJson
+                {
+                    Produto = par.produto.Adapt<ProdutoSimuladoJson>(),
+                    Resultado = par.simulacao.Adapt<ResultadoSimulacaoJson>(),
+                    DataSimulacao = par.simulacao.DataSimulacao
+                })
+                .ToList()
         };
+
+        return resposta;
     }
 
-    private async Task<Produto> ObterProdutoCompativel(RequisicaoSimulacaoJson requisicao)
+    private async Task<IReadOnlyCollection<Produto>> ObterProdutosCompativeis(RequisicaoSimulacaoJson requisicao)
     {
         var produtos = await _produtoRepositorio.ListarAtivosPorTipoAsync(requisicao.TipoProduto);
 
-        var produtoSelecionado = produtos
+        var produtosCompativeis = produtos
             .Where(produto => ProdutoEhCompativel(produto, requisicao))
             .OrderByDescending(produto => produto.Rentabilidade)
-            .FirstOrDefault();
+            .ToList();
 
-        if (produtoSelecionado is null)
+        if (produtosCompativeis.Count == 0)
             throw new NaoEncontradoException(MensagensDeExcecao.PRODUTO_NAO_ENCONTRADO);
 
-        return produtoSelecionado;
+        return produtosCompativeis.AsReadOnly();
     }
 
     private static bool ProdutoEhCompativel(Produto produto, RequisicaoSimulacaoJson requisicao)
     {
-        var prazoEhValido = requisicao.PrazoMeses >= produto.PrazoMinimoMeses && requisicao.PrazoMeses <= produto.PrazoMaximoMeses;
+        var prazoMinimo = Math.Max(produto.PrazoMinimoMeses, 0);
+        var prazoMaximo = produto.PrazoMaximoMeses <= 0 ? int.MaxValue : produto.PrazoMaximoMeses;
+
+        var prazoEhValido = requisicao.PrazoMeses >= prazoMinimo && requisicao.PrazoMeses <= prazoMaximo;
         var valorEhSuficiente = requisicao.Valor >= produto.MinimoInvestimento;
 
         return prazoEhValido && valorEhSuficiente;

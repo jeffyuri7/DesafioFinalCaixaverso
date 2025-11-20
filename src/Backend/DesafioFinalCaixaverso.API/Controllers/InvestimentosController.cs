@@ -17,7 +17,7 @@ public class InvestimentosController : ControllerBaseV1
     [Authorize]
     [SwaggerOperation(
         Summary = "Solicita uma nova simulação.",
-        Description = "Valida o cliente, seleciona o produto compatível e retorna o resultado da simulação.",
+        Description = "Valida o cliente, localiza todos os produtos compatíveis e retorna uma simulação para cada um deles.",
         Tags = new[] { "Investimentos" })]
     [ProducesResponseType(typeof(RespostaSimulacaoJson), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(RespostaErroJson), StatusCodes.Status400BadRequest)]

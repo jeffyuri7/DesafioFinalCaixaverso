@@ -13,8 +13,8 @@ public class RegistradorTelemetriaServicos : IRegistradorTelemetriaServicos
         _telemetriaServicoRepositorio = telemetriaServicoRepositorio;
     }
 
-    public async Task RegistrarAsync(string servico, CancellationToken cancellationToken = default)
+    public async Task RegistrarAsync(string servico, long tempoRespostaMs, CancellationToken cancellationToken = default)
     {
-        await _telemetriaServicoRepositorio.RegistrarChamadaAsync(servico, cancellationToken);
+        await _telemetriaServicoRepositorio.RegistrarChamadaAsync(servico, tempoRespostaMs, cancellationToken);
     }
 }

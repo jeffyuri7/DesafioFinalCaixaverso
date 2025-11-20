@@ -2,6 +2,7 @@ using DesafioFinalCaixaverso.Aplicacao.Servicos.Perfis;
 using DesafioFinalCaixaverso.Communications.Requests;
 using DesafioFinalCaixaverso.Communications.Responses;
 using DesafioFinalCaixaverso.Dominio.Entidades;
+using DesafioFinalCaixaverso.Dominio.Seguranca;
 using Mapster;
 
 namespace DesafioFinalCaixaverso.Aplicacao.Mapeamentos;
@@ -22,6 +23,10 @@ public static class MapsterConfiguracoes
             .Map(destino => destino.ProdutoNome, origem => origem.Produto != null ? origem.Produto.Nome : string.Empty);
 
         TypeAdapterConfig<Produto, ProdutoRecomendadoJson>
+            .NewConfig()
+            .Map(destino => destino.Risco, origem => origem.Risco.ToString());
+
+        TypeAdapterConfig<Produto, ProdutoSimuladoJson>
             .NewConfig()
             .Map(destino => destino.Risco, origem => origem.Risco.ToString());
 
@@ -49,6 +54,14 @@ public static class MapsterConfiguracoes
             .Ignore(destino => destino.AtualizadoEm);
 
         TypeAdapterConfig<QuestionarioInvestidor, QuestionarioRespondidoJson>
+            .NewConfig();
+
+        TypeAdapterConfig<Cliente, ClienteAutenticadoJson>
+            .NewConfig()
+            .Map(destino => destino.ClienteId, origem => origem.Id)
+            .Ignore(destino => destino.Token);
+
+        TypeAdapterConfig<TokenAcesso, TokenAcessoJson>
             .NewConfig();
     }
 }

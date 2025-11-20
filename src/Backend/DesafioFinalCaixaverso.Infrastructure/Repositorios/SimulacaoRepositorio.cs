@@ -32,6 +32,10 @@ public class SimulacaoRepositorio : ISimulacaoRepositorio
 
     public async Task<IReadOnlyCollection<SimulacoesPorProdutoDiaResultado>> ListarAgrupadoPorProdutoEDiaAsync(CancellationToken cancellationToken = default)
     {
+        var existemSimulacoes = await _dbContext.Simulacoes.AsNoTracking().AnyAsync(cancellationToken);
+        if (!existemSimulacoes)
+            return Array.Empty<SimulacoesPorProdutoDiaResultado>();
+
         var query = _dbContext.Simulacoes
             .AsNoTracking()
             .Join(

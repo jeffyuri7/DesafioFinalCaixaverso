@@ -17,7 +17,7 @@ public class TelemetriaServicoRepositorio : ITelemetriaServicoRepositorio
 
     public TelemetriaServicoRepositorio(CaixaversoDbContext dbContext) => _dbContext = dbContext;
 
-    public async Task RegistrarChamadaAsync(string servico, CancellationToken cancellationToken = default)
+    public async Task RegistrarChamadaAsync(string servico, long tempoRespostaMs, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(servico))
             return;
@@ -26,8 +26,17 @@ public class TelemetriaServicoRepositorio : ITelemetriaServicoRepositorio
         if (servicoNormalizado.Length > TamanhoMaximoNomeServico)
             servicoNormalizado = servicoNormalizado[..TamanhoMaximoNomeServico];
 
+        var agora = DateTime.UtcNow;
+        var anoReferencia = agora.Year;
+        var mesReferencia = agora.Month;
+        var tempoRegistrado = tempoRespostaMs < 0 ? 0 : tempoRespostaMs;
+
         var registro = await _dbContext.TelemetriaServicos
-            .FirstOrDefaultAsync(t => t.Servico == servicoNormalizado, cancellationToken);
+            .FirstOrDefaultAsync(
+                t => t.Servico == servicoNormalizado &&
+                     t.AnoReferencia == anoReferencia &&
+                     t.MesReferencia == mesReferencia,
+                cancellationToken);
 
         if (registro is null)
         {
@@ -35,8 +44,11 @@ public class TelemetriaServicoRepositorio : ITelemetriaServicoRepositorio
             {
                 Id = Guid.NewGuid(),
                 Servico = servicoNormalizado,
+                AnoReferencia = anoReferencia,
+                MesReferencia = mesReferencia,
                 QuantidadeChamadas = 1,
-                UltimaChamada = DateTime.UtcNow
+                TempoTotalRespostaMs = tempoRegistrado,
+                UltimaChamada = agora
             };
 
             await _dbContext.TelemetriaServicos.AddAsync(registro, cancellationToken);
@@ -44,17 +56,19 @@ public class TelemetriaServicoRepositorio : ITelemetriaServicoRepositorio
         else
         {
             registro.QuantidadeChamadas++;
-            registro.UltimaChamada = DateTime.UtcNow;
+            registro.TempoTotalRespostaMs += tempoRegistrado;
+            registro.UltimaChamada = agora;
             _dbContext.TelemetriaServicos.Update(registro);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<TelemetriaServico>> ListarAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<TelemetriaServico>> ListarPorPeriodoAsync(int anoReferencia, int mesReferencia, CancellationToken cancellationToken = default)
     {
         var registros = await _dbContext.TelemetriaServicos
             .AsNoTracking()
+            .Where(t => t.AnoReferencia == anoReferencia && t.MesReferencia == mesReferencia)
             .OrderByDescending(t => t.QuantidadeChamadas)
             .ThenByDescending(t => t.UltimaChamada)
             .ToListAsync(cancellationToken);

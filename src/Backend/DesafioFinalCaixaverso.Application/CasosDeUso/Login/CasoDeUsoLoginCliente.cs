@@ -6,6 +6,7 @@ using DesafioFinalCaixaverso.Dominio.Repositorios;
 using DesafioFinalCaixaverso.Dominio.Seguranca;
 using DesafioFinalCaixaverso.Exceptions;
 using DesafioFinalCaixaverso.Exceptions.ExceptionsBase;
+using Mapster;
 
 namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Login;
 
@@ -35,15 +36,10 @@ public class CasoDeUsoLoginCliente : ICasoDeUsoLoginCliente
 
         var token = _geradorTokenAcesso.Gerar(cliente.Id);
 
-        return new ClienteAutenticadoJson
-        {
-            ClienteId = cliente.Id,
-            Nome = cliente.Nome,
-            Token = new TokenAcessoJson
-            {
-                Valor = token.Valor,
-                ExpiraEm = token.ExpiraEm
-            }
-        };
+        var resposta = cliente.Adapt<ClienteAutenticadoJson>();
+        resposta.ClienteId = cliente.Id;
+        resposta.Token = token.Adapt<TokenAcessoJson>();
+
+        return resposta;
     }
 }

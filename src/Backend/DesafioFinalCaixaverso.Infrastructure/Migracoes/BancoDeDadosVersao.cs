@@ -8,4 +8,5 @@ public abstract class BancoDeDadosVersao
     public const int TABELA_TELEMETRIA_SERVICO = 4;
     public const int TABELA_CLIENTE_PERFIL = 5;
     public const int TABELA_QUESTIONARIO_INVESTIDOR = 6;
+    public const int AJUSTES_TELEMETRIA_SERVICO = 7;
 }
