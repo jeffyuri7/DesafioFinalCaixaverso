@@ -100,6 +100,95 @@ public class ConsultarPerfilCompletoTests : DesafioFinalCaixaversoClassFixture
     }
 
     [Fact]
+    public async Task Deve_retornar_nao_classificado_quando_questionario_nao_existir()
+    {
+        await Factory.ResetDatabaseAsync();
+
+        var cliente = new ConstrutorCliente().Construir();
+        var produto = new ConstrutorProduto()
+            .ComNome("Fundo Crédito Privado")
+            .ComRentabilidade(0.11m)
+            .ComLiquidezDias(30)
+            .Construir();
+
+        var simulacao = new ConstrutorSimulacao()
+            .ComClienteId(cliente.Id)
+            .ComProduto(produto)
+            .ComValorInvestido(35_000m)
+            .Construir();
+
+        await Factory.ExecutarNoContextoAsync(async contexto =>
+        {
+            await contexto.Clientes.AddAsync(cliente);
+            await contexto.Produtos.AddAsync(produto);
+            await contexto.Simulacoes.AddAsync(simulacao);
+        });
+
+        var token = GerarToken(cliente.Id);
+        var resposta = await DoGet($"{RotaBase}/{cliente.Id}", token);
+
+        resposta.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var perfil = await resposta.Content.ReadFromJsonAsync<PerfilClienteJson>(JsonOptions);
+        perfil.ShouldNotBeNull();
+        perfil!.ClienteId.ShouldBe(cliente.Id);
+        perfil.Perfil.ShouldBe(nameof(PerfilInvestidor.NaoClassificado));
+        perfil.PermiteRecomendacao.ShouldBeFalse();
+        perfil.MetodoCalculo.ShouldBe("motor_v2_comportamental_parcial");
+        perfil.PontuacaoQuestionario.ShouldBe(0);
+        perfil.PontuacaoComportamental.ShouldBeGreaterThan(0);
+        perfil.DadosSuficientes.ShouldBeTrue();
+        perfil.Observacoes.ShouldContain("Questionário obrigatório");
+
+        await Factory.ExecutarNoContextoAsync(async contexto =>
+        {
+            var perfilPersistido = await contexto.ClientePerfis.SingleAsync();
+            perfilPersistido.ClienteId.ShouldBe(cliente.Id);
+            perfilPersistido.Perfil.ShouldBe(PerfilInvestidor.NaoClassificado);
+            perfilPersistido.PermiteRecomendacao.ShouldBeFalse();
+            perfilPersistido.MetodoCalculo.ShouldBe("motor_v2_comportamental_parcial");
+        });
+    }
+
+    [Fact]
+    public async Task Deve_retornar_sem_dados_quando_historico_e_questionario_inexistirem()
+    {
+        await Factory.ResetDatabaseAsync();
+
+        var cliente = new ConstrutorCliente().Construir();
+
+        await Factory.ExecutarNoContextoAsync(async contexto =>
+        {
+            await contexto.Clientes.AddAsync(cliente);
+        });
+
+        var token = GerarToken(cliente.Id);
+        var resposta = await DoGet($"{RotaBase}/{cliente.Id}", token);
+
+        resposta.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var perfil = await resposta.Content.ReadFromJsonAsync<PerfilClienteJson>(JsonOptions);
+        perfil.ShouldNotBeNull();
+        perfil!.Perfil.ShouldBe(nameof(PerfilInvestidor.NaoClassificado));
+        perfil.PermiteRecomendacao.ShouldBeFalse();
+        perfil.DadosSuficientes.ShouldBeFalse();
+        perfil.MetodoCalculo.ShouldBe("motor_v2_sem_dados");
+        perfil.Observacoes.ShouldContain("Impossível classificar");
+        perfil.Pontuacao.ShouldBe(0);
+        perfil.PontuacaoComportamental.ShouldBe(0);
+        perfil.PontuacaoQuestionario.ShouldBe(0);
+
+        await Factory.ExecutarNoContextoAsync(async contexto =>
+        {
+            var perfilPersistido = await contexto.ClientePerfis.SingleAsync();
+            perfilPersistido.ClienteId.ShouldBe(cliente.Id);
+            perfilPersistido.Perfil.ShouldBe(PerfilInvestidor.NaoClassificado);
+            perfilPersistido.PermiteRecomendacao.ShouldBeFalse();
+            perfilPersistido.MetodoCalculo.ShouldBe("motor_v2_sem_dados");
+        });
+    }
+
+    [Fact]
     public async Task Deve_retornar_erro_quando_cliente_nao_existir()
     {
         await Factory.ResetDatabaseAsync();
