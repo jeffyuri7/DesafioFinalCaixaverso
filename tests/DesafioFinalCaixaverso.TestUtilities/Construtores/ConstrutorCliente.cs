@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using Bogus;
 using DesafioFinalCaixaverso.Dominio.Entidades;
 
@@ -16,7 +17,7 @@ public class ConstrutorCliente
             Id = Guid.NewGuid(),
             Nome = faker.Person.FullName,
             Email = faker.Internet.Email().ToLowerInvariant(),
-            Password = "hash::senha",
+            Password = $"hash::{GerarHashAleatorio()}",
             DataCriacao = DateTime.UtcNow
         };
     }
@@ -34,4 +35,11 @@ public class ConstrutorCliente
     }
 
     public Cliente Construir() => _cliente;
+
+    private static string GerarHashAleatorio()
+    {
+        Span<byte> buffer = stackalloc byte[32];
+        RandomNumberGenerator.Fill(buffer);
+        return Convert.ToHexString(buffer);
+    }
 }

@@ -14,9 +14,16 @@ dotnet test DesafioFinalCaixaverso.slnx
 ```
 
 ## Subindo com Docker Compose
-```powershell
-docker compose up -d --build
-```
+1. Copie o arquivo de exemplo e defina uma senha forte para o SQL Server:
+	```powershell
+	cd source
+	copy .env.example .env
+	# edite o arquivo e altere CAIXAVERSO_SQL_PASSWORD
+	```
+2. Suba os containers normalmente:
+	```powershell
+	docker compose up -d --build
+	```
 A API estará disponível em `http://localhost:8080/swagger`.
 
 ### Endpoints 
