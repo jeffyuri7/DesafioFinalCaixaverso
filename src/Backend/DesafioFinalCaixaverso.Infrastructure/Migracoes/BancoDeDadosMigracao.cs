@@ -32,7 +32,9 @@ public static class BancoDeDadosMigracao
 
         if (!registros.Any())
         {
-            conexao.Execute($"CREATE DATABASE [{nomeBancoDeDados}]");
+            using var commandBuilder = new SqlCommandBuilder();
+            var nomeBancoSeguro = commandBuilder.QuoteIdentifier(nomeBancoDeDados);
+            conexao.Execute($"CREATE DATABASE {nomeBancoSeguro}");
         }
     }
 
