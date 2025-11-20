@@ -22,7 +22,7 @@ public class RegistroTelemetriaMiddlewareTestes
 
         await middleware.InvokeAsync(context, registrador);
 
-        registrador.ServicosRegistrados.ShouldContain("GET v1/investimentos/simulacoes");
+        registrador.ServicosRegistrados.ShouldContain(entry => entry.Servico == "GET v1/investimentos/simulacoes" && entry.TempoRespostaMs >= 0);
     }
 
     [Fact]
@@ -36,16 +36,16 @@ public class RegistroTelemetriaMiddlewareTestes
 
         await middleware.InvokeAsync(context, registrador);
 
-        registrador.ServicosRegistrados.ShouldContain("v1:telemetria");
+        registrador.ServicosRegistrados.ShouldContain(entry => entry.Servico == "telemetria");
     }
 
     private sealed class RegistradorTelemetriaServicosFalso : IRegistradorTelemetriaServicos
     {
-        public List<string> ServicosRegistrados { get; } = new();
+        public List<(string Servico, long TempoRespostaMs)> ServicosRegistrados { get; } = new();
 
-        public Task RegistrarAsync(string servico, CancellationToken cancellationToken = default)
+        public Task RegistrarAsync(string servico, long tempoRespostaMs, CancellationToken cancellationToken = default)
         {
-            ServicosRegistrados.Add(servico);
+            ServicosRegistrados.Add((servico, tempoRespostaMs));
             return Task.CompletedTask;
         }
     }

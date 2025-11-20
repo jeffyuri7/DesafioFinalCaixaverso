@@ -10,42 +10,41 @@ namespace DesafioFinalCaixaverso.UseCases.UnitTests.Telemetria;
 public class CasoDeUsoConsultarTelemetriaServicosTestes
 {
     [Fact]
-    public async Task Deve_retornar_registros_de_telemetria()
+    public async Task Deve_retornar_resumo_do_mes_atual()
     {
         var repositorio = new TelemetriaServicoRepositorioFalso();
+        var agora = DateTime.UtcNow;
         repositorio.Registros.Add(new TelemetriaServico
         {
             Id = Guid.NewGuid(),
             Servico = "v1/investimentos/simulacoes",
+            AnoReferencia = agora.Year,
+            MesReferencia = agora.Month,
             QuantidadeChamadas = 3,
-            UltimaChamada = DateTime.UtcNow
+            TempoTotalRespostaMs = 900,
+            UltimaChamada = agora
         });
 
         var casoDeUso = new CasoDeUsoConsultarTelemetriaServicos(repositorio);
 
         var resposta = await casoDeUso.Executar();
 
-        resposta.ShouldHaveSingleItem();
-        resposta.First().QuantidadeChamadas.ShouldBe(3);
+        resposta.Servicos.ShouldHaveSingleItem();
+        resposta.Servicos.First().QuantidadeChamadas.ShouldBe(3);
+        resposta.Servicos.First().MediaTempoRespostaMs.ShouldBe(300);
+        resposta.Periodo.Inicio.Day.ShouldBe(1);
+        resposta.Periodo.Inicio.Month.ShouldBe(agora.Month);
+        resposta.Periodo.Fim.Month.ShouldBe(agora.Month);
     }
 
     [Fact]
-    public async Task Deve_preservar_data_da_ultima_chamada()
+    public async Task Deve_retornar_lista_vazia_quando_nao_existir_registros_no_periodo()
     {
-        var ultimaChamada = new DateTime(2025, 11, 17, 8, 30, 0, DateTimeKind.Utc);
         var repositorio = new TelemetriaServicoRepositorioFalso();
-        repositorio.Registros.Add(new TelemetriaServico
-        {
-            Id = Guid.NewGuid(),
-            Servico = "v1/telemetria",
-            QuantidadeChamadas = 1,
-            UltimaChamada = ultimaChamada
-        });
-
         var casoDeUso = new CasoDeUsoConsultarTelemetriaServicos(repositorio);
 
         var resposta = await casoDeUso.Executar();
 
-        resposta.ShouldHaveSingleItem().UltimaChamada.ShouldBe(ultimaChamada);
+        resposta.Servicos.ShouldBeEmpty();
     }
 }

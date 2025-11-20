@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
 using DesafioFinalCaixaverso.Communications.Requests;
@@ -44,12 +45,12 @@ public class CasoDeUsoSolicitarSimulacaoTestes
     }
 
     [Fact]
-    public async Task Deve_criar_simulacao_quando_dados_forem_validos()
+    public async Task Deve_criar_simulacoes_para_todos_produtos_compativeis()
     {
         var cliente = new Cliente { Id = Guid.NewGuid(), Nome = "Cliente Teste", Email = "teste@teste.com" };
         var clienteRepositorio = new ClienteRepositorioFalso().ComClienteExistente(cliente);
 
-        var produto = new ConstrutorProduto()
+        var produtoCdb = new ConstrutorProduto()
             .ComTipo("CDB")
             .ComMinimoInvestimento(500)
             .ComPrazo(6, 48)
@@ -57,7 +58,15 @@ public class CasoDeUsoSolicitarSimulacaoTestes
             .Ativo(true)
             .Construir();
 
-        var produtoRepositorio = new ProdutoRepositorioFalso().ComProdutos(new[] { produto });
+        var produtoLci = new ConstrutorProduto()
+            .ComTipo("CDB")
+            .ComMinimoInvestimento(500)
+            .ComPrazo(6, 60)
+            .ComRentabilidade(0.12m)
+            .Ativo(true)
+            .Construir();
+
+        var produtoRepositorio = new ProdutoRepositorioFalso().ComProdutos(new[] { produtoCdb, produtoLci });
         var simulacaoRepositorio = new SimulacaoRepositorioFalso();
         var unidadeDeTrabalho = new UnidadeDeTrabalhoFalsa();
         var casoDeUso = CriarCasoDeUso(clienteRepositorio, produtoRepositorio, simulacaoRepositorio, unidadeDeTrabalho);
@@ -66,19 +75,53 @@ public class CasoDeUsoSolicitarSimulacaoTestes
             .ComClienteId(cliente.Id)
             .ComValor(2_000m)
             .ComPrazoMeses(12)
-            .ComTipoProduto(produto.Tipo)
+            .ComTipoProduto(produtoCdb.Tipo)
             .Construir();
 
         var resposta = await casoDeUso.Executar(requisicao);
 
-    resposta.ShouldNotBeNull();
-    resposta.ProdutoValidado.Id.ShouldBe(produto.Id);
+        resposta.ShouldNotBeNull();
+        resposta.Simulacoes.Count.ShouldBe(2);
+        var produtosSimulados = resposta.Simulacoes.Select(s => s.Produto.Id).ToList();
+        produtosSimulados.ShouldContain(produtoCdb.Id);
+        produtosSimulados.ShouldContain(produtoLci.Id);
 
-    var simulacaoPersistida = simulacaoRepositorio.UltimaSimulacaoAdicionada;
-    simulacaoPersistida.ShouldNotBeNull();
-    simulacaoPersistida!.ClienteId.ShouldBe(cliente.Id);
+        simulacaoRepositorio.SimulacoesAdicionadas.Count.ShouldBe(2);
+        simulacaoRepositorio.SimulacoesAdicionadas.ShouldAllBe(s => s.ClienteId == cliente.Id);
 
-    unidadeDeTrabalho.CommitFoiChamado.ShouldBeTrue();
+        unidadeDeTrabalho.CommitFoiChamado.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Deve_simular_produtos_sem_prazo_maximo_definido()
+    {
+        var cliente = new Cliente { Id = Guid.NewGuid(), Nome = "Cliente Teste", Email = "teste@teste.com" };
+        var clienteRepositorio = new ClienteRepositorioFalso().ComClienteExistente(cliente);
+
+        var produtoSemPrazoMaximo = new ConstrutorProduto()
+            .ComTipo("Tesouro Direto")
+            .ComMinimoInvestimento(100)
+            .ComPrazo(0, 0)
+            .ComRentabilidade(0.06m)
+            .Ativo(true)
+            .Construir();
+
+        var produtoRepositorio = new ProdutoRepositorioFalso().ComProdutos(new[] { produtoSemPrazoMaximo });
+        var simulacaoRepositorio = new SimulacaoRepositorioFalso();
+        var unidadeDeTrabalho = new UnidadeDeTrabalhoFalsa();
+        var casoDeUso = CriarCasoDeUso(clienteRepositorio, produtoRepositorio, simulacaoRepositorio, unidadeDeTrabalho);
+
+        var requisicao = new ConstrutorRequisicaoSimulacao()
+            .ComClienteId(cliente.Id)
+            .ComValor(produtoSemPrazoMaximo.MinimoInvestimento + 50)
+            .ComPrazoMeses(24)
+            .ComTipoProduto(produtoSemPrazoMaximo.Tipo)
+            .Construir();
+
+        var resposta = await casoDeUso.Executar(requisicao);
+
+        resposta.Simulacoes.ShouldHaveSingleItem();
+        resposta.Simulacoes.Single().Produto.Id.ShouldBe(produtoSemPrazoMaximo.Id);
     }
 
     private static CasoDeUsoSolicitarSimulacao CriarCasoDeUso(

@@ -12,7 +12,7 @@ public class RegistradorTelemetriaServicosTestes
         var repositorio = new TelemetriaServicoRepositorioFalso();
         var registrador = new RegistradorTelemetriaServicos(repositorio);
 
-        await registrador.RegistrarAsync("v1/investimentos/simulacoes");
+        await registrador.RegistrarAsync("v1/investimentos/simulacoes", 250);
 
         repositorio.UltimoServicoRegistrado.ShouldBe("v1/investimentos/simulacoes");
     }
@@ -23,10 +23,11 @@ public class RegistradorTelemetriaServicosTestes
         var repositorio = new TelemetriaServicoRepositorioFalso();
         var registrador = new RegistradorTelemetriaServicos(repositorio);
 
-        await registrador.RegistrarAsync("v1/investimentos/simulacoes");
-        await registrador.RegistrarAsync("v1/investimentos/simulacoes");
+        await registrador.RegistrarAsync("v1/investimentos/simulacoes", 200);
+        await registrador.RegistrarAsync("v1/investimentos/simulacoes", 400);
 
         var registro = repositorio.Registros.ShouldHaveSingleItem();
         registro.QuantidadeChamadas.ShouldBe(2);
+        registro.TempoTotalRespostaMs.ShouldBe(600);
     }
 }

@@ -115,4 +115,19 @@ public class InvestimentosControllerTests : IClassFixture<CustomWebApplicationFa
         grupoLci.ValorTotalInvestido.ShouldBe(3_000m);
         grupoLci.Dia.Date.ShouldBe(diaAnterior);
     }
+
+    [Fact]
+    public async Task Deve_retornar_lista_vazia_quando_nao_existir_simulacoes()
+    {
+        await _factory.ResetDatabaseAsync();
+
+        var resposta = await _client.GetAsync("v1/investimentos/simulacoes/por-produto-dia");
+
+        var conteudo = await resposta.Content.ReadAsStringAsync();
+        resposta.StatusCode.ShouldBe(HttpStatusCode.OK, conteudo);
+
+        var agrupado = JsonSerializer.Deserialize<List<SimulacoesPorProdutoDiaJson>>(conteudo, JsonOptions);
+        agrupado.ShouldNotBeNull();
+        agrupado.ShouldBeEmpty();
+    }
 }

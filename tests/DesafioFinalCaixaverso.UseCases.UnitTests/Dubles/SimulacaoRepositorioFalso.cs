@@ -12,12 +12,14 @@ namespace DesafioFinalCaixaverso.UseCases.UnitTests.Dubles;
 public class SimulacaoRepositorioFalso : ISimulacaoRepositorio
 {
     public SimulacaoDominio? UltimaSimulacaoAdicionada { get; private set; }
+    public List<SimulacaoDominio> SimulacoesAdicionadas { get; } = new();
     private IReadOnlyCollection<SimulacaoDominio> _historico = new List<SimulacaoDominio>();
     private IReadOnlyCollection<SimulacoesPorProdutoDiaResultado> _agrupado = new List<SimulacoesPorProdutoDiaResultado>();
 
     public Task AdicionarAsync(SimulacaoDominio simulacao)
     {
         UltimaSimulacaoAdicionada = simulacao;
+        SimulacoesAdicionadas.Add(simulacao);
         return Task.CompletedTask;
     }
 

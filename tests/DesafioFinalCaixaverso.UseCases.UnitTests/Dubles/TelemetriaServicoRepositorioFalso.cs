@@ -12,7 +12,7 @@ public class TelemetriaServicoRepositorioFalso : ITelemetriaServicoRepositorio
     public List<TelemetriaServico> Registros { get; } = new();
     public string? UltimoServicoRegistrado { get; private set; }
 
-    public Task RegistrarChamadaAsync(string servico, CancellationToken cancellationToken = default)
+    public Task RegistrarChamadaAsync(string servico, long tempoRespostaMs, CancellationToken cancellationToken = default)
     {
         UltimoServicoRegistrado = servico;
         var registro = Registros.Find(r => r.Servico == servico);
@@ -22,7 +22,10 @@ public class TelemetriaServicoRepositorioFalso : ITelemetriaServicoRepositorio
             {
                 Id = Guid.NewGuid(),
                 Servico = servico,
+                AnoReferencia = DateTime.UtcNow.Year,
+                MesReferencia = DateTime.UtcNow.Month,
                 QuantidadeChamadas = 1,
+                TempoTotalRespostaMs = tempoRespostaMs,
                 UltimaChamada = DateTime.UtcNow
             };
             Registros.Add(registro);
@@ -30,12 +33,19 @@ public class TelemetriaServicoRepositorioFalso : ITelemetriaServicoRepositorio
         else
         {
             registro.QuantidadeChamadas++;
+            registro.TempoTotalRespostaMs += tempoRespostaMs;
             registro.UltimaChamada = DateTime.UtcNow;
         }
 
         return Task.CompletedTask;
     }
 
-    public Task<IReadOnlyCollection<TelemetriaServico>> ListarAsync(CancellationToken cancellationToken = default)
-        => Task.FromResult((IReadOnlyCollection<TelemetriaServico>)Registros.AsReadOnly());
+    public Task<IReadOnlyCollection<TelemetriaServico>> ListarPorPeriodoAsync(int anoReferencia, int mesReferencia, CancellationToken cancellationToken = default)
+    {
+        var filtrado = Registros
+            .FindAll(r => r.AnoReferencia == anoReferencia && r.MesReferencia == mesReferencia)
+            .AsReadOnly();
+
+        return Task.FromResult((IReadOnlyCollection<TelemetriaServico>)filtrado);
+    }
 }

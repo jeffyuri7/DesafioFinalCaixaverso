@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Dominio.Entidades;
@@ -9,24 +10,24 @@ namespace DesafioFinalCaixaverso.UseCases.UnitTests.Dubles;
 
 public class ClienteRepositorioFalso : IClienteRepositorio
 {
-    private bool _clienteExiste;
-    private Cliente? _cliente;
+    private readonly List<Cliente> _clientes = new();
     private readonly HashSet<string> _emailsCadastrados = new(StringComparer.OrdinalIgnoreCase);
 
     public Cliente? ClienteAdicionado { get; private set; }
 
     public ClienteRepositorioFalso ComClienteExistente(Cliente cliente)
     {
-        _clienteExiste = true;
-        _cliente = cliente;
+        AdicionarOuAtualizar(cliente);
         _emailsCadastrados.Add(cliente.Email);
+        SincronizarEmails();
         return this;
     }
 
     public ClienteRepositorioFalso SemCliente()
     {
-        _clienteExiste = false;
-        _cliente = null;
+        _clientes.Clear();
+        ClienteAdicionado = null;
+        _emailsCadastrados.Clear();
         return this;
     }
 
@@ -38,31 +39,20 @@ public class ClienteRepositorioFalso : IClienteRepositorio
 
     public Task<bool> ExisteClienteAsync(Guid clienteId)
     {
-        var existeClienteAtual = _clienteExiste && _cliente?.Id == clienteId;
-        var existeClienteAdicionado = ClienteAdicionado?.Id == clienteId;
-        return Task.FromResult(existeClienteAtual || existeClienteAdicionado);
+        var existeCliente = _clientes.Any(cliente => cliente.Id == clienteId);
+        return Task.FromResult(existeCliente);
     }
 
     public Task<Cliente?> ObterPorIdAsync(Guid clienteId)
     {
-        if (_cliente is not null && _cliente.Id == clienteId)
-            return Task.FromResult<Cliente?>(_cliente);
-
-        if (ClienteAdicionado is not null && ClienteAdicionado.Id == clienteId)
-            return Task.FromResult<Cliente?>(ClienteAdicionado);
-
-        return Task.FromResult<Cliente?>(null);
+        var cliente = _clientes.FirstOrDefault(cliente => cliente.Id == clienteId);
+        return Task.FromResult<Cliente?>(cliente);
     }
 
     public Task<Cliente?> ObterPorEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        if (_cliente is not null && string.Equals(_cliente.Email, email, StringComparison.OrdinalIgnoreCase))
-            return Task.FromResult<Cliente?>(_cliente);
-
-        if (ClienteAdicionado is not null && string.Equals(ClienteAdicionado.Email, email, StringComparison.OrdinalIgnoreCase))
-            return Task.FromResult<Cliente?>(ClienteAdicionado);
-
-        return Task.FromResult<Cliente?>(null);
+        var cliente = _clientes.FirstOrDefault(cliente => string.Equals(cliente.Email, email, StringComparison.OrdinalIgnoreCase));
+        return Task.FromResult<Cliente?>(cliente);
     }
 
     public Task<bool> EmailJaCadastradoAsync(string email, CancellationToken cancellationToken = default)
@@ -72,10 +62,49 @@ public class ClienteRepositorioFalso : IClienteRepositorio
 
     public Task AdicionarAsync(Cliente cliente, CancellationToken cancellationToken = default)
     {
+        AdicionarOuAtualizar(cliente);
         ClienteAdicionado = cliente;
-        _cliente = cliente;
-        _clienteExiste = true;
-        _emailsCadastrados.Add(cliente.Email);
+        SincronizarEmails();
         return Task.CompletedTask;
+    }
+
+    public Task<IReadOnlyCollection<Cliente>> ListarAsync(CancellationToken cancellationToken = default)
+    {
+        IReadOnlyCollection<Cliente> clientes = _clientes.AsReadOnly();
+        return Task.FromResult(clientes);
+    }
+
+    public Task AtualizarAsync(Cliente cliente, CancellationToken cancellationToken = default)
+    {
+        AdicionarOuAtualizar(cliente);
+        SincronizarEmails();
+        return Task.CompletedTask;
+    }
+
+    public Task RemoverAsync(Cliente cliente, CancellationToken cancellationToken = default)
+    {
+        _clientes.RemoveAll(c => c.Id == cliente.Id);
+        if (ClienteAdicionado?.Id == cliente.Id)
+            ClienteAdicionado = null;
+
+        SincronizarEmails();
+
+        return Task.CompletedTask;
+    }
+
+    private void AdicionarOuAtualizar(Cliente cliente)
+    {
+        var indice = _clientes.FindIndex(c => c.Id == cliente.Id);
+        if (indice >= 0)
+            _clientes[indice] = cliente;
+        else
+            _clientes.Add(cliente);
+
+        _emailsCadastrados.Add(cliente.Email);
+    }
+
+    private void SincronizarEmails()
+    {
+        _emailsCadastrados.RemoveWhere(email => !_clientes.Any(cliente => string.Equals(cliente.Email, email, StringComparison.OrdinalIgnoreCase)));
     }
 }
