@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Dominio.Entidades;
@@ -21,8 +23,9 @@ public class ProdutoRepositorioFalso : IProdutoRepositorio
 
     public Task<IReadOnlyCollection<Produto>> ListarAtivosPorTipoAsync(string tipoProduto)
     {
+        var tipoNormalizado = NormalizarTipo(tipoProduto);
         var produtosFiltrados = _produtos
-            .Where(produto => produto.Tipo.Equals(tipoProduto, StringComparison.InvariantCultureIgnoreCase) && produto.Ativo)
+            .Where(produto => produto.Ativo && NormalizarTipo(produto.Tipo) == tipoNormalizado)
             .ToList()
             .AsReadOnly();
 
@@ -58,5 +61,26 @@ public class ProdutoRepositorioFalso : IProdutoRepositorio
             PerfilInvestidor.Agressivo => riscoProduto == Risco.Alto,
             _ => false
         };
+    }
+
+    private static string NormalizarTipo(string valor)
+    {
+        if (string.IsNullOrWhiteSpace(valor))
+            return string.Empty;
+
+        var trimmed = valor.Trim().ToUpperInvariant().Normalize(NormalizationForm.FormD);
+        var builder = new StringBuilder(trimmed.Length);
+
+        foreach (var caractere in trimmed)
+        {
+            var categoria = CharUnicodeInfo.GetUnicodeCategory(caractere);
+            if (categoria == UnicodeCategory.NonSpacingMark)
+                continue;
+
+            if (char.IsLetterOrDigit(caractere))
+                builder.Append(caractere);
+        }
+
+        return builder.ToString();
     }
 }

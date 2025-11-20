@@ -124,6 +124,37 @@ public class CasoDeUsoSolicitarSimulacaoTestes
         resposta.Simulacoes.Single().Produto.Id.ShouldBe(produtoSemPrazoMaximo.Id);
     }
 
+    [Fact]
+    public async Task Deve_encontrar_produtos_quando_tipo_possuir_formatacao_diferente()
+    {
+        var cliente = new Cliente { Id = Guid.NewGuid(), Nome = "Cliente Teste", Email = "teste@teste.com" };
+        var clienteRepositorio = new ClienteRepositorioFalso().ComClienteExistente(cliente);
+
+        var produto = new ConstrutorProduto()
+            .ComTipo("Fundo (Renda Fixa)")
+            .ComMinimoInvestimento(200)
+            .ComPrazo(3, 24)
+            .Ativo(true)
+            .Construir();
+
+        var produtoRepositorio = new ProdutoRepositorioFalso().ComProdutos(new[] { produto });
+        var simulacaoRepositorio = new SimulacaoRepositorioFalso();
+        var unidadeDeTrabalho = new UnidadeDeTrabalhoFalsa();
+        var casoDeUso = CriarCasoDeUso(clienteRepositorio, produtoRepositorio, simulacaoRepositorio, unidadeDeTrabalho);
+
+        var requisicao = new ConstrutorRequisicaoSimulacao()
+            .ComClienteId(cliente.Id)
+            .ComValor(500)
+            .ComPrazoMeses(12)
+            .ComTipoProduto("fundo-renda-fixa")
+            .Construir();
+
+        var resposta = await casoDeUso.Executar(requisicao);
+
+        resposta.Simulacoes.ShouldHaveSingleItem();
+        resposta.Simulacoes.Single().Produto.Id.ShouldBe(produto.Id);
+    }
+
     private static CasoDeUsoSolicitarSimulacao CriarCasoDeUso(
         ClienteRepositorioFalso clienteRepositorio,
         ProdutoRepositorioFalso produtoRepositorio,
