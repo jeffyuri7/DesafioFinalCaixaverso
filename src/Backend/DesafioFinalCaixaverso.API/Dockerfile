@@ -13,4 +13,9 @@ WORKDIR /app
 
 COPY --from=build-env /app/out .
 
+RUN useradd --create-home --shell /usr/sbin/nologin appuser \
+	&& chown -R appuser:appuser /app
+
+USER appuser
+
 ENTRYPOINT ["dotnet", "DesafioFinalCaixaverso.API.dll"]

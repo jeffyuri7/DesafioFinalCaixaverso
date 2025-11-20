@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+using System.Text.RegularExpressions;
 using Dapper;
 using FluentMigrator.Runner;
 using Microsoft.Data.SqlClient;
@@ -8,6 +9,8 @@ namespace DesafioFinalCaixaverso.Infraestrutura.Migracoes;
 
 public static class BancoDeDadosMigracao
 {
+    private static readonly Regex NomeBancoPermitidoRegex = new("^[A-Za-z0-9_]+$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     public static void Migracao(string connectionString, IServiceProvider serviceProvider)
     {
         VerificarBancoDeDadosCriado(connectionString);
@@ -19,7 +22,7 @@ public static class BancoDeDadosMigracao
     {
         var construtorBancoDeDados = new SqlConnectionStringBuilder(connectionString);
 
-        var nomeBancoDeDados = construtorBancoDeDados.InitialCatalog;
+    var nomeBancoDeDados = SanitizarNomeBanco(construtorBancoDeDados.InitialCatalog);
 
         construtorBancoDeDados.Remove("Database");
 
@@ -32,9 +35,8 @@ public static class BancoDeDadosMigracao
 
         if (!registros.Any())
         {
-            using var commandBuilder = new SqlCommandBuilder();
-            var nomeBancoSeguro = commandBuilder.QuoteIdentifier(nomeBancoDeDados);
-            conexao.Execute($"CREATE DATABASE {nomeBancoSeguro}");
+            var nomeEscapado = ObterNomeEscapado(conexao, nomeBancoDeDados);
+            conexao.Execute($"CREATE DATABASE {nomeEscapado}");
         }
     }
 
@@ -45,5 +47,21 @@ public static class BancoDeDadosMigracao
         executor.ListMigrations();
 
         executor.MigrateUp();
+    }
+
+    private static string SanitizarNomeBanco(string nome)
+    {
+        if (string.IsNullOrWhiteSpace(nome))
+            throw new ArgumentException("Nome do banco de dados inválido.", nameof(nome));
+
+        if (!NomeBancoPermitidoRegex.IsMatch(nome))
+            throw new ArgumentException("Nome do banco de dados contém caracteres inválidos. Use apenas letras, números ou underscore.", nameof(nome));
+
+        return nome;
+    }
+
+    private static string ObterNomeEscapado(SqlConnection conexao, string nome)
+    {
+        return conexao.QuerySingle<string>("SELECT QUOTENAME(@nome)", new { nome });
     }
 }
