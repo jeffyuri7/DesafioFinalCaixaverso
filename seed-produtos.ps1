@@ -1,4 +1,4 @@
-<#[
+﻿<#[
 SEED SCRIPT: seed-produtos.ps1
 
 Uso (ex.: em CI / docker-compose init):
@@ -31,16 +31,16 @@ Add-Type -AssemblyName System.Data
 $SqlServerInstance = "$SqlServerHost,$SqlServerPort"
 
 $builder = [System.Data.SqlClient.SqlConnectionStringBuilder]::new()
-$builder.DataSource = $SqlServerInstance
-$builder.InitialCatalog = $DatabaseName
-$builder.UserID = $SqlAdminUser
-$builder.Password = $SqlAdminPassword
-$builder.TrustServerCertificate = $true
-$builder.Encrypt = $false
+$builder["Data Source"] = $SqlServerInstance
+$builder["Initial Catalog"] = $DatabaseName
+$builder["User ID"] = $SqlAdminUser
+$builder["Password"] = $SqlAdminPassword
+$builder["TrustServerCertificate"] = $true
+$builder["Encrypt"] = $false
 
 $TargetConnectionString = $builder.ConnectionString
 $masterBuilder = [System.Data.SqlClient.SqlConnectionStringBuilder]::new($builder.ConnectionString)
-$masterBuilder.InitialCatalog = "master"
+$masterBuilder["Initial Catalog"] = "master"
 $MasterConnectionString = $masterBuilder.ConnectionString
 
 Write-Host "=== Seed Produtos CaixaVerso ==="
@@ -132,7 +132,7 @@ Wait-ForProdutosTable -RetryCount $MaxRetries -DelaySeconds $RetryDelaySeconds
 
 $sqlSeed = @'
 DECLARE @SeedProdutos TABLE(
-    Id UNIQUEIDENTIFIER NOT NULL,
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWSEQUENTIALID(),
     Nome NVARCHAR(200) NOT NULL,
     Tipo NVARCHAR(100) NOT NULL,
     Rentabilidade DECIMAL(18,4) NOT NULL,
@@ -144,44 +144,44 @@ DECLARE @SeedProdutos TABLE(
     Ativo BIT NOT NULL
 );
 
-INSERT INTO @SeedProdutos (Id, Nome, Tipo, Rentabilidade, Risco, LiquidezDias, MinimoInvestimento, PrazoMinimoMeses, PrazoMaximoMeses, Ativo)
+INSERT INTO @SeedProdutos (Nome, Tipo, Rentabilidade, Risco, LiquidezDias, MinimoInvestimento, PrazoMinimoMeses, PrazoMaximoMeses, Ativo)
 VALUES
-    ('00000000-0000-0000-0000-000000000001','Poupança Caixa','Poupança',0.0350,0,0,0.01,0,0,1),
-    ('00000000-0000-0000-0000-000000000002','CDB Caixa Flex Liquidez Diária','CDB',0.0400,0,0,1000.00,6,6,1),
-    ('00000000-0000-0000-0000-000000000003','CDB Caixa Pré-Fixado 36 meses','CDB',0.1000,1,0,1000.00,36,36,1),
-    ('00000000-0000-0000-0000-000000000004','CDB Caixa Pós-Fixado CDI 24 meses','CDB',0.0850,1,0,500.00,24,24,1),
-    ('00000000-0000-0000-0000-000000000005','LCI Caixa 24 meses','LCI',0.0950,1,90,5000.00,24,24,1),
-    ('00000000-0000-0000-0000-000000000006','LCA Caixa 36 meses','LCA',0.0920,1,90,5000.00,36,36,1),
-    ('00000000-0000-0000-0000-000000000007','Tesouro Selic (via Caixa)','Tesouro Direto',0.0600,0,0,100.00,0,0,1),
-    ('00000000-0000-0000-0000-000000000008','Tesouro IPCA+ 5 anos (via Caixa)','Tesouro Direto',0.0800,1,30,100.00,60,60,1),
-    ('00000000-0000-0000-0000-000000000009','Fundo Caixa Renda Fixa Simples','Fundo (Renda Fixa)',0.0600,0,0,100.00,3,3,1),
-    ('00000000-0000-0000-0000-000000000010','Fundo Caixa Renda Fixa Longo Prazo','Fundo (Renda Fixa)',0.0650,1,30,1000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000011','Fundo Caixa Referenciado DI','Fundo Referenciado',0.0550,0,0,100.00,3,3,1),
-    ('00000000-0000-0000-0000-000000000012','Fundo Caixa Referenciado IPCA','Fundo Referenciado',0.0700,1,30,1000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000013','Fundo Caixa Multimercado Estratégico','Fundo (Multimercado)',0.0950,1,7,5000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000014','Fundo Caixa Multimercado Macro','Fundo (Multimercado)',0.1200,2,30,10000.00,36,36,1),
-    ('00000000-0000-0000-0000-000000000015','Fundo Caixa Multimercado Alocacao Macro','Fundo (Multimercado)',0.1100,2,30,8000.00,24,24,1),
-    ('00000000-0000-0000-0000-000000000016','Fundo Caixa Acoes Brasil','Fundo (Ações)',0.1500,2,90,2000.00,60,60,1),
-    ('00000000-0000-0000-0000-000000000017','Fundo Caixa Acoes Global','Fundo (Ações)',0.1300,2,90,2000.00,60,60,1),
-    ('00000000-0000-0000-0000-000000000018','Fundo Caixa Cambial Moeda','Fundo (Cambial)',0.1200,2,30,5000.00,24,24,1),
-    ('00000000-0000-0000-0000-000000000019','Fundo Caixa Imobiliario (FII)','Fundo Imobiliario',0.0850,1,30,1000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000020','Oferta Pública Debênture Infra (Caixa)','Oferta Pública',0.1100,1,365,10000.00,60,60,1),
-    ('00000000-0000-0000-0000-000000000021','Oferta Pública Nota Promissória Caixa','Oferta Pública',0.0900,0,90,5000.00,6,6,1),
-    ('00000000-0000-0000-0000-000000000022','Operacao Compromissada Caixa Curto Prazo','Compromissada',0.0450,0,0,10000.00,1,1,1),
-    ('00000000-0000-0000-0000-000000000023','Operacao Compromissada Caixa Longo Prazo','Compromissada',0.0550,1,30,5000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000024','Previdencia Caixa VGBL Conservador','Previdencia',0.0500,0,0,100.00,60,60,1),
-    ('00000000-0000-0000-0000-000000000025','Previdencia Caixa VGBL Moderado','Previdencia',0.0800,1,30,1000.00,120,120,1),
-    ('00000000-0000-0000-0000-000000000026','COE Caixa Capital Protegido (Simulado)','COE',0.1000,1,365,5000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000027','COE Caixa Alavancado Brasil (Simulado)','COE',0.1800,2,365,10000.00,36,36,1),
-    ('00000000-0000-0000-0000-000000000028','LCI Caixa Longo Prazo 60 mes','LCI',0.0980,1,90,5000.00,60,60,1),
-    ('00000000-0000-0000-0000-000000000029','LCA Caixa Longo Prazo 60 mes','LCA',0.0960,1,90,5000.00,60,60,1),
-    ('00000000-0000-0000-0000-000000000030','Fundo Caixa Multimercado Juros e Moedas','Fundo (Multimercado)',0.0900,1,30,5000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000031','ETF Caixa Brasil (simulado)','ETF',0.1400,2,2,1000.00,12,12,1),
-    ('00000000-0000-0000-0000-000000000032','Titulo Corporativo Caixa (simulado) - curto','Titulo Corporativo',0.0650,0,30,2000.00,6,6,1);
+    (N'Poupança Caixa',N'Poupança',0.0350,0,0,0.01,0,0,1),
+    (N'CDB Caixa Flex Liquidez Diária',N'CDB',0.0400,0,0,1000.00,6,6,1),
+    (N'CDB Caixa Pré-Fixado 36 meses',N'CDB',0.1000,1,0,1000.00,36,36,1),
+    (N'CDB Caixa Pós-Fixado CDI 24 meses',N'CDB',0.0850,1,0,500.00,24,24,1),
+    (N'LCI Caixa 24 meses',N'LCI',0.0950,1,90,5000.00,24,24,1),
+    (N'LCA Caixa 36 meses',N'LCA',0.0920,1,90,5000.00,36,36,1),
+    (N'Tesouro Selic (via Caixa)',N'Tesouro Direto',0.0600,0,0,100.00,0,0,1),
+    (N'Tesouro IPCA+ 5 anos (via Caixa)',N'Tesouro Direto',0.0800,1,30,100.00,60,60,1),
+    (N'Fundo Caixa Renda Fixa Simples',N'Fundo (Renda Fixa)',0.0600,0,0,100.00,3,3,1),
+    (N'Fundo Caixa Renda Fixa Longo Prazo',N'Fundo (Renda Fixa)',0.0650,1,30,1000.00,12,12,1),
+    (N'Fundo Caixa Referenciado DI',N'Fundo Referenciado',0.0550,0,0,100.00,3,3,1),
+    (N'Fundo Caixa Referenciado IPCA',N'Fundo Referenciado',0.0700,1,30,1000.00,12,12,1),
+    (N'Fundo Caixa Multimercado Estratégico',N'Fundo (Multimercado)',0.0950,1,7,5000.00,12,12,1),
+    (N'Fundo Caixa Multimercado Macro',N'Fundo (Multimercado)',0.1200,2,30,10000.00,36,36,1),
+    (N'Fundo Caixa Multimercado Alocacao Macro',N'Fundo (Multimercado)',0.1100,2,30,8000.00,24,24,1),
+    (N'Fundo Caixa Acoes Brasil',N'Fundo (Ações)',0.1500,2,90,2000.00,60,60,1),
+    (N'Fundo Caixa Acoes Global',N'Fundo (Ações)',0.1300,2,90,2000.00,60,60,1),
+    (N'Fundo Caixa Cambial Moeda',N'Fundo (Cambial)',0.1200,2,30,5000.00,24,24,1),
+    (N'Fundo Caixa Imobiliario (FII)',N'Fundo Imobiliario',0.0850,1,30,1000.00,12,12,1),
+    (N'Oferta Pública Debênture Infra (Caixa)',N'Oferta Pública',0.1100,1,365,10000.00,60,60,1),
+    (N'Oferta Pública Nota Promissória Caixa',N'Oferta Pública',0.0900,0,90,5000.00,6,6,1),
+    (N'Operacao Compromissada Caixa Curto Prazo',N'Compromissada',0.0450,0,0,10000.00,1,1,1),
+    (N'Operacao Compromissada Caixa Longo Prazo',N'Compromissada',0.0550,1,30,5000.00,12,12,1),
+    (N'Previdencia Caixa VGBL Conservador',N'Previdencia',0.0500,0,0,100.00,60,60,1),
+    (N'Previdencia Caixa VGBL Moderado',N'Previdencia',0.0800,1,30,1000.00,120,120,1),
+    (N'COE Caixa Capital Protegido (Simulado)',N'COE',0.1000,1,365,5000.00,12,12,1),
+    (N'COE Caixa Alavancado Brasil (Simulado)',N'COE',0.1800,2,365,10000.00,36,36,1),
+    (N'LCI Caixa Longo Prazo 60 mes',N'LCI',0.0980,1,90,5000.00,60,60,1),
+    (N'LCA Caixa Longo Prazo 60 mes',N'LCA',0.0960,1,90,5000.00,60,60,1),
+    (N'Fundo Caixa Multimercado Juros e Moedas',N'Fundo (Multimercado)',0.0900,1,30,5000.00,12,12,1),
+    (N'ETF Caixa Brasil (simulado)',N'ETF',0.1400,2,2,1000.00,12,12,1),
+    (N'Titulo Corporativo Caixa (simulado) - curto',N'Titulo Corporativo',0.0650,0,30,2000.00,6,6,1);
 
 ;MERGE dbo.Produtos AS Target
 USING @SeedProdutos AS Source
-    ON Target.Id = Source.Id
+    ON Target.Nome = Source.Nome
 WHEN MATCHED THEN
     UPDATE SET
         Nome = Source.Nome,

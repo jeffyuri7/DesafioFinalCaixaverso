@@ -54,8 +54,9 @@ public class ProdutoRepositorioFalso : IProdutoRepositorio
         return perfilInvestidor switch
         {
             PerfilInvestidor.Conservador => riscoProduto == Risco.Baixo,
-            PerfilInvestidor.Moderado => riscoProduto == Risco.Baixo || riscoProduto == Risco.Medio,
-            _ => true
+            PerfilInvestidor.Moderado => riscoProduto == Risco.Medio,
+            PerfilInvestidor.Agressivo => riscoProduto == Risco.Alto,
+            _ => false
         };
     }
 }

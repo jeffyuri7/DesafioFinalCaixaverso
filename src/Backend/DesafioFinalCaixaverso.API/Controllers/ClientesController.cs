@@ -30,7 +30,16 @@ public class ClientesController : ControllerBaseV1
     [HttpPost("{clienteId:guid}/questionario")]
     [SwaggerOperation(
         Summary = "Registra ou atualiza o questionário do cliente.",
-        Description = "Salva as respostas do questionário ANBIMA exigido para recomendações.",
+        Description = """
+            Questionário ANBIMA obrigatório. Campos esperados:
+            - preferenciaLiquidez: 0=Alta, 1=Média, 2=Baixa
+            - objetivoInvestimento: 0=Preservação, 1=Renda, 2=Equilíbrio, 3=Crescimento
+            - nivelConhecimento: 0=Iniciante, 1=Intermediário, 2=Avançado
+            - horizonteMeses: mínimo 1 mês
+            - rendaMensal/patrimonioTotal: valores em reais (decimal)
+            - toleranciaPerdaPercentual: percentual permitido entre 0 e 100
+            - fonteRendaEstavel: true/false indicando estabilidade de renda
+            """,
         Tags = new[] { "Clientes" })]
     [ProducesResponseType(typeof(QuestionarioRespondidoJson), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespostaErroJson), StatusCodes.Status400BadRequest)]

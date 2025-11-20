@@ -16,7 +16,7 @@ public class ProdutosRecomendadosController : ControllerBase
     [HttpGet("{perfil}")]
     [SwaggerOperation(
         Summary = "Lista produtos alinhados ao perfil informado.",
-        Description = "Permite explorar oportunidades de investimento já filtrando o nível de risco compatível.",
+        Description = "Perfis aceitos: -1=Não classificado (sem recomendações), 0=Conservador (risco baixo), 1=Moderado (risco médio), 2=Agressivo (risco alto).",
         Tags = new[] { "Perfil de Risco" })]
     [ProducesResponseType(typeof(IEnumerable<ProdutoRecomendadoJson>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListarPorPerfil(

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -31,19 +32,24 @@ public class ProdutoRepositorio : IProdutoRepositorio
 
     public async Task<IReadOnlyCollection<Produto>> ListarPorPerfilAsync(PerfilInvestidor perfil, CancellationToken cancellationToken = default)
     {
-        var riscosPermitidos = perfil switch
+        var riscoEsperado = perfil switch
         {
-            PerfilInvestidor.Conservador => new[] { Risco.Baixo },
-            PerfilInvestidor.Moderado => new[] { Risco.Baixo, Risco.Medio },
-            _ => new[] { Risco.Baixo, Risco.Medio, Risco.Alto }
+            PerfilInvestidor.Conservador => Risco.Baixo,
+            PerfilInvestidor.Moderado => Risco.Medio,
+            PerfilInvestidor.Agressivo => Risco.Alto,
+            _ => (Risco?)null
         };
+
+        if (!riscoEsperado.HasValue)
+        {
+            return Array.Empty<Produto>();
+        }
 
         var produtos = await _dbContext
             .Produtos
             .AsNoTracking()
-            .Where(produto => produto.Ativo && riscosPermitidos.Contains(produto.Risco))
-            .OrderBy(produto => produto.Risco)
-            .ThenBy(produto => produto.Nome)
+            .Where(produto => produto.Ativo && produto.Risco == riscoEsperado.Value)
+            .OrderBy(produto => produto.Nome)
             .ToListAsync(cancellationToken);
 
         return produtos.AsReadOnly();
