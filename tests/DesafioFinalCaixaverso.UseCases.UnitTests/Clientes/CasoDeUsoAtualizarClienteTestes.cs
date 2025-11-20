@@ -16,6 +16,7 @@ public class CasoDeUsoAtualizarClienteTestes
     public async Task Deve_atualizar_dados_basicos_sem_alterar_senha_quando_nao_informada()
     {
         var clienteExistente = new ConstrutorCliente().Construir();
+        var senhaAnterior = clienteExistente.Password;
         var clienteRepositorio = new ClienteRepositorioFalso().ComClienteExistente(clienteExistente);
         var unidadeDeTrabalho = new UnidadeDeTrabalhoFalsa();
         var servicoHash = new ServicoHashSenhaFalso();
@@ -32,7 +33,7 @@ public class CasoDeUsoAtualizarClienteTestes
 
         resposta.Nome.ShouldBe("Novo Nome");
         resposta.Email.ShouldBe("novo@email.com");
-        clienteExistente.Password.ShouldBe("hash::senha");
+        clienteExistente.Password.ShouldBe(senhaAnterior);
         unidadeDeTrabalho.CommitFoiChamado.ShouldBeTrue();
     }
 
