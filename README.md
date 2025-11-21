@@ -1,11 +1,17 @@
 # DesafioFinalCaixaverso
 
-## Requisitos
-- .NET 8 SDK
-- Docker Desktop
-- PowerShell (para rodar o seed)
+Plataforma completa para simulação de investimentos, classificação de perfil de risco (compliance ANBIMA) e recomendação de produtos Caixa. O projeto está dividido em camadas (`API`, `Application`, `Domain`, `Infrastructure` e `Communications`) mais a suíte de testes.
 
-## Build e testes
+## ⚙️ Requisitos
+
+- .NET 8 SDK
+- Docker Desktop (para executar toda a stack)
+- PowerShell 5+ (scripts de seed/local setup)
+
+## 🚀 Rodando localmente
+
+### Build e testes rápidos
+
 ```powershell
 cd source
 dotnet restore DesafioFinalCaixaverso.slnx
@@ -13,38 +19,72 @@ dotnet build DesafioFinalCaixaverso.slnx
 dotnet test DesafioFinalCaixaverso.slnx
 ```
 
-## Subindo com Docker Compose
-1. Copie o arquivo de exemplo e defina uma senha forte para o SQL Server:
+### Subindo com Docker Compose
+
+1. Configure variáveis sensíveis:
+
 	```powershell
 	cd source
 	copy .env.example .env
 	# edite o arquivo e altere CAIXAVERSO_SQL_PASSWORD
 	```
-2. Suba os containers normalmente:
+
+2. Start da stack (API + SQL Server):
+
 	```powershell
 	docker compose up -d --build
 	```
-A API estará disponível em `http://localhost:8080/swagger`.
 
-### Endpoints principais
-- `POST v1/investimentos/simular-investimento` — calcula e persiste uma nova simulação (requer Bearer Token).
-- `GET v1/investimentos/simulacoes` — lista o histórico completo de simulações ordenado pela data.
-- `GET v1/investimentos/simulacoes/por-produto-dia` — agrega volume diário por produto para dashboards.
-- `GET v1/investimentos/{clienteId}` — retorna apenas os investimentos do cliente autenticado.
-- `GET v1/telemetria` — exibe consumo dos serviços e período corrente.
-- `GET v1/perfil-risco/{clienteId}` — resumo textual do perfil com descrição amigável.
-- `GET v1/perfil-risco-completo/{clienteId}` — retorna os detalhes usados na classificação e persiste o histórico.
-- `GET v1/produtos-recomendados/{perfil}` — recomenda produtos compatíveis com o perfil informado.
-- `POST v1/login` — autentica o cliente e gera o token JWT utilizado nos demais endpoints protegidos.
-- `GET v1/clientes` — consulta os clientes cadastrados (apenas rotas administradas).
-- `GET v1/clientes/{clienteId}` — consulta detalhada do cliente.
-- `POST v1/clientes` — cadastra um novo cliente aplicando hash seguro.
-- `PUT v1/clientes/{clienteId}` — atualiza dados básicos e senha opcionalmente.
-- `DELETE v1/clientes/{clienteId}` — remove o cliente e relações.
-- `POST v1/clientes/{clienteId}/questionario` — registra ou atualiza o questionário suitability.
+3. A Swagger UI sobe em `http://localhost:8080/swagger`.
 
-## Como responder o questionário do investidor
-O endpoint `POST v1/clientes/{clienteId}/questionario` aceita um corpo JSON com enumerações representadas por inteiros. Utilize a tabela abaixo ao preencher os campos enumerados:
+4. Para encerrar:
+
+	```powershell
+	docker compose down
+	docker compose down -v # remove volume de dados
+	```
+
+### Seeds
+
+```powershell
+./seed-data.ps1        # clientes, produtos, perfis
+./seed-produtos.ps1    # catálogo extendido opcional
+```
+
+Use `-HashSecret` nos scripts se personalizar `Seguranca:HashSenha:Chave` no `appsettings` para manter os hashes consistentes.
+
+## 🔐 Autenticação e segurança
+
+- `POST v1/login` retorna JWT utilizado nas rotas protegidas (`Authorization: Bearer <token>`).
+- Senhas são persistidas com hash + salt e o token inclui `ClienteId` e perfil.
+- Algumas rotas (questionário, simulações do cliente) verificam coerência entre token e `clienteId` informado.
+
+## 🧠 Motor de perfil de risco
+
+- **Questionário suitability**: liquidez, horizonte, tolerância a perda, objetivo, conhecimento e situação financeira. Sem questionário válido o cliente permanece “Não classificado”.
+- **Dimensão comportamental**: avalia últimas simulações (volume, frequência, rentabilidade média e liquidez média dos produtos). A lógica compartilha o mesmo algoritmo (`PerfilPontuacaoHelper`).
+- **Faixas de pontuação**:
+  - ≤ 40 → Conservador
+  - 41–70 → Moderado
+  - > 70 → Agressivo
+- `GET v1/perfil-risco/{clienteId}` entrega resumo enxuto; `GET v1/perfil-risco-completo/{clienteId}` retorna dados de cálculo e histórico.
+
+## 📡 Endpoints principais
+
+- `POST v1/investimentos/simular-investimento` — valida cliente, encontra produtos compatíveis e retorna `{ produtoValidado, resultadoSimulacao, dataSimulacao }`.
+- `GET v1/investimentos/simulacoes` — histórico completo.
+- `GET v1/investimentos/simulacoes/por-produto-dia` — métricas para dashboards.
+- `GET v1/investimentos/{clienteId}` — lista compacta `{ id, tipo, valor, rentabilidade, data }` do cliente autenticado.
+- `GET v1/produtos-recomendados/{perfil}` — responde apenas `{ id, nome, tipo, rentabilidade, risco }`.
+- `GET v1/telemetria` — uso de serviços externos (OpenAI, Service Bus etc.).
+- `POST v1/clientes/{clienteId}/questionario` — atualiza o suitability obrigatório.
+- `POST v1/clientes` / `PUT v1/clientes/{id}` — CRUD de clientes com hash de senha.
+
+> Consulte `next-steps` e `instrucoes.md` para backlog adicional de endpoints.
+
+## 📝 Questionário do investidor
+
+O payload usa enums numéricos; tabela de apoio:
 
 | Campo | Valor | Significado |
 | --- | --- | --- |
@@ -61,12 +101,10 @@ O endpoint `POST v1/clientes/{clienteId}/questionario` aceita um corpo JSON com 
 
 Outros campos:
 
-- `horizonteMeses`: inteiro ≥ 1 (meses planejados para manter o investimento).
-- `rendaMensal` e `patrimonioTotal`: valores decimais em reais (aceitam duas casas).
-- `toleranciaPerdaPercentual`: decimal entre 0 e 100 representando a perda máxima aceitável.
-- `fonteRendaEstavel`: booleano (`true`/`false`).
-
-Exemplo de payload válido:
+- `horizonteMeses` ≥ 1
+- `rendaMensal`, `patrimonioTotal`: decimal (duas casas)
+- `toleranciaPerdaPercentual`: decimal 0–100
+- `fonteRendaEstavel`: booleano
 
 ```json
 {
@@ -81,27 +119,24 @@ Exemplo de payload válido:
 }
 ```
 
-Essas descrições também estão visíveis no Swagger UI para facilitar o preenchimento manual.
+As mesmas descrições aparecem no Swagger para facilitar testes manuais.
 
-## Sistema de análise de perfil de risco
-- O motor combina **questionário formal** do investidor (liquidez, horizonte, tolerância a perdas, conhecimento, objetivo e situação financeira) com **dados comportamentais** das simulações realizadas (volume, frequência, rentabilidade média e liquidez dos produtos).
-- As respostas do questionário são obrigatórias conforme as diretrizes da **ANBIMA**: sem o formulário válido o cliente permanece como “Não classificado” e nenhuma recomendação é liberada.
-- Cada dimensão gera notas ponderadas que formam uma pontuação final (0 a 100). A classificação segue as faixas previstas no cálculo:
-	- **≤ 40 pontos** → Perfil Conservador
-	- **41 a 70 pontos** → Perfil Moderado
-	- **> 70 pontos** → Perfil Agressivo
-- O histórico salvo em `ClientePerfis` mantém pontuações comportamental e do questionário, método de cálculo e observações para auditoria.
+## 🧱 Arquitetura e tecnologias
 
-## Seed de dados
-```powershell
-./seed-data.ps1
-```
-O script insere dados básicos no banco já criado pelas migrations.
+- ASP.NET Core 8 + Mapster + FluentValidation
+- EF Core + SQL Server (migrations via FluentMigrator)
+- Camada de infraestrutura com Service Bus, OpenAI, Blob Storage (mockados nos testes)
+- Testes: xUnit + Shouldly + WebApplicationFactory (integração)
+- Pipelines: `release-pipeline.yml` e `docker-compose.yml` na raiz
 
-> Use o parâmetro opcional `-HashSecret` caso altere a chave configurada em `Seguranca:HashSenha:Chave` para manter os hashes das senhas em sincronia.
+## ✅ Qualidade
 
-## Parar containers
-```powershell
-docker compose down
-docker compose down -v # remove volume de dados
-```
+- `dotnet test DesafioFinalCaixaverso.slnx` cobre unitários, validators e integração.
+- SonarCloud acompanha smells (Dockerfile, SQL injection, payloads) — ajustes recentes já atendem aos alertas.
+- `next-steps` documenta melhorias futuras (telemetria, dashboards, ajuste de payloads).
+
+## 🆘 Troubleshooting rápido
+
+- **Login falhou?** Garanta que rodou `seed-data.ps1` para criar usuário demo e revise `Seguranca:Jwt`.
+- **Erro de acesso ao SQL?** Confirme `CAIXAVERSO_SQL_PASSWORD` e reinicie `docker compose` limpando volumes.
+- **JWT expirado**: tokens duram 30 min — refaça o login antes de chamar endpoints protegidos.
