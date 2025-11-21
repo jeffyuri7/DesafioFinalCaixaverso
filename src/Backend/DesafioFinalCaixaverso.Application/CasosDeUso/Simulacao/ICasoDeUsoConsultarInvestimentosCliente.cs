@@ -8,5 +8,5 @@ namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Simulacao;
 
 public interface ICasoDeUsoConsultarInvestimentosCliente
 {
-    Task<IReadOnlyCollection<HistoricoSimulacaoJson>> Executar(Guid clienteId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<InvestimentoClienteJson>> Executar(Guid clienteId, CancellationToken cancellationToken = default);
 }

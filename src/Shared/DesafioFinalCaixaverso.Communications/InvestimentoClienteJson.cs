@@ -2,11 +2,11 @@ using System;
 
 namespace DesafioFinalCaixaverso.Communications.Responses;
 
-public class ProdutoRecomendadoJson
+public class InvestimentoClienteJson
 {
     public Guid Id { get; set; }
-    public string Nome { get; set; } = string.Empty;
     public string Tipo { get; set; } = string.Empty;
+    public decimal Valor { get; set; }
     public decimal Rentabilidade { get; set; }
-    public string Risco { get; set; } = string.Empty;
+    public DateTime Data { get; set; }
 }

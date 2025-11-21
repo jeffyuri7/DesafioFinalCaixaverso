@@ -20,7 +20,14 @@ public static class MapsterConfiguracoes
 
         TypeAdapterConfig<Simulacao, HistoricoSimulacaoJson>
             .NewConfig()
-            .Map(destino => destino.ProdutoNome, origem => origem.Produto != null ? origem.Produto.Nome : string.Empty);
+            .Map(destino => destino.Produto, origem => origem.Produto != null ? origem.Produto.Nome : string.Empty);
+
+        TypeAdapterConfig<Simulacao, InvestimentoClienteJson>
+            .NewConfig()
+            .Map(destino => destino.Tipo, origem => origem.Produto != null ? origem.Produto.Tipo : string.Empty)
+            .Map(destino => destino.Valor, origem => origem.ValorInvestido)
+            .Map(destino => destino.Rentabilidade, origem => origem.RentabilidadeEfetiva)
+            .Map(destino => destino.Data, origem => origem.DataSimulacao.Date);
 
         TypeAdapterConfig<Produto, ProdutoRecomendadoJson>
             .NewConfig()

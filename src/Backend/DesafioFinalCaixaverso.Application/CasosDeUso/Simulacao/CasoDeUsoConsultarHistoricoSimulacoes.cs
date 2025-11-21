@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using DesafioFinalCaixaverso.Aplicacao.Mapeamentos;
 using DesafioFinalCaixaverso.Communications.Responses;
 using DesafioFinalCaixaverso.Dominio.Repositorios;
 using Mapster;
@@ -14,6 +15,7 @@ public class CasoDeUsoConsultarHistoricoSimulacoes : ICasoDeUsoConsultarHistoric
     public CasoDeUsoConsultarHistoricoSimulacoes(ISimulacaoRepositorio simulacaoRepositorio)
     {
         _simulacaoRepositorio = simulacaoRepositorio;
+        MapsterConfiguracoes.Registrar();
     }
 
     public async Task<IReadOnlyCollection<HistoricoSimulacaoJson>> Executar(CancellationToken cancellationToken = default)

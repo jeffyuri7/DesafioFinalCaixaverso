@@ -18,8 +18,8 @@ public class CasoDeUsoConsultarHistoricoSimulacoesTestes
 
         var historico = await casoDeUso.Executar();
 
-        historico.ShouldHaveSingleItem();
-        historico.First().ProdutoNome.ShouldBe(simulacao.Produto!.Nome);
+    historico.ShouldHaveSingleItem();
+    historico.First().Produto.ShouldBe(simulacao.Produto!.Nome);
     }
 
     [Fact]
@@ -37,8 +37,7 @@ public class CasoDeUsoConsultarHistoricoSimulacoesTestes
 
         var dto = historico.ShouldHaveSingleItem();
         dto.DataSimulacao.ShouldBe(dataSimulacao);
-        dto.ValorInvestido.ShouldBe(8_500m);
-        dto.ValorFinal.ShouldBe(simulacao.ValorFinal);
-        dto.RentabilidadeEfetiva.ShouldBe(simulacao.RentabilidadeEfetiva);
+    dto.ValorInvestido.ShouldBe(8_500m);
+    dto.ValorFinal.ShouldBe(simulacao.ValorFinal);
     }
 }

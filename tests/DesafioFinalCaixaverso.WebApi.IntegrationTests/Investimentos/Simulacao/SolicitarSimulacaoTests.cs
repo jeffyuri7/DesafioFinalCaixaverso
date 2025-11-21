@@ -67,9 +67,9 @@ public class SolicitarSimulacaoTests : DesafioFinalCaixaversoClassFixture
     simulacoes.ShouldNotBeNull();
     simulacoes!.Simulacoes.ShouldHaveSingleItem();
         var simulacao = simulacoes.Simulacoes.Single();
-    simulacao.Produto.Nome.ShouldBe(produtoCompativel.Nome);
-    simulacao.Resultado.ValorInvestido.ShouldBe(requisicao.Valor);
-    simulacao.Resultado.PrazoMeses.ShouldBe(requisicao.PrazoMeses);
+    simulacao.ProdutoValidado.Nome.ShouldBe(produtoCompativel.Nome);
+    simulacao.ResultadoSimulacao.ValorFinal.ShouldBeGreaterThan(requisicao.Valor);
+    simulacao.ResultadoSimulacao.PrazoMeses.ShouldBe(requisicao.PrazoMeses);
     }
 
     [Fact]

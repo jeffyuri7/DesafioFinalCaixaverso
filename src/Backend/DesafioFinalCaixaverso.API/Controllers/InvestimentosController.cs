@@ -66,7 +66,7 @@ public class InvestimentosController : ControllerBaseV1
         Summary = "Consulta as simulações do cliente.",
         Description = "Filtra o histórico retornando apenas os investimentos realizados pelo cliente informado.",
         Tags = new[] { "Investimentos" })]
-    [ProducesResponseType(typeof(IEnumerable<HistoricoSimulacaoJson>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<InvestimentoClienteJson>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RespostaErroJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ListarInvestimentosPorCliente(
         Guid clienteId,

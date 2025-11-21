@@ -62,7 +62,7 @@ public class InvestimentosControllerTests : IClassFixture<CustomWebApplicationFa
         historico.Count.ShouldBe(2);
         historico.First().Id.ShouldBe(simulacaoRecente.Id);
         historico.First().ValorInvestido.ShouldBe(10_000m);
-        historico.Last().ProdutoNome.ShouldBe(produto.Nome);
+    historico.Last().Produto.ShouldBe(produto.Nome);
         historico.Last().ValorInvestido.ShouldBe(2_500m);
     }
 

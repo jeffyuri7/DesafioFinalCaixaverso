@@ -82,7 +82,7 @@ public class CasoDeUsoSolicitarSimulacaoTestes
 
         resposta.ShouldNotBeNull();
         resposta.Simulacoes.Count.ShouldBe(2);
-        var produtosSimulados = resposta.Simulacoes.Select(s => s.Produto.Id).ToList();
+    var produtosSimulados = resposta.Simulacoes.Select(s => s.ProdutoValidado.Id).ToList();
         produtosSimulados.ShouldContain(produtoCdb.Id);
         produtosSimulados.ShouldContain(produtoLci.Id);
 
@@ -121,7 +121,7 @@ public class CasoDeUsoSolicitarSimulacaoTestes
         var resposta = await casoDeUso.Executar(requisicao);
 
         resposta.Simulacoes.ShouldHaveSingleItem();
-        resposta.Simulacoes.Single().Produto.Id.ShouldBe(produtoSemPrazoMaximo.Id);
+    resposta.Simulacoes.Single().ProdutoValidado.Id.ShouldBe(produtoSemPrazoMaximo.Id);
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class CasoDeUsoSolicitarSimulacaoTestes
         var resposta = await casoDeUso.Executar(requisicao);
 
         resposta.Simulacoes.ShouldHaveSingleItem();
-        resposta.Simulacoes.Single().Produto.Id.ShouldBe(produto.Id);
+    resposta.Simulacoes.Single().ProdutoValidado.Id.ShouldBe(produto.Id);
     }
 
     private static CasoDeUsoSolicitarSimulacao CriarCasoDeUso(

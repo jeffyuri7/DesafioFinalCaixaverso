@@ -58,10 +58,10 @@ public class ListarHistoricoTests : DesafioFinalCaixaversoClassFixture
         historico.ShouldNotBeNull();
         var lista = historico!;
         lista.Count.ShouldBe(2);
-        lista.First().Id.ShouldBe(simulacaoRecente.Id);
-        lista.First().ValorInvestido.ShouldBe(10_000m);
-        lista.Last().ProdutoNome.ShouldBe(produto.Nome);
-        lista.Last().ValorInvestido.ShouldBe(2_500m);
+    lista.First().Id.ShouldBe(simulacaoRecente.Id);
+    lista.First().ValorInvestido.ShouldBe(10_000m);
+    lista.Last().Produto.ShouldBe(produto.Nome);
+    lista.Last().ValorInvestido.ShouldBe(2_500m);
     }
 
     [Fact]

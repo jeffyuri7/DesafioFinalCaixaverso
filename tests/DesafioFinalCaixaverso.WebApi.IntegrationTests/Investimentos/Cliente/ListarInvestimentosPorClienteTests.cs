@@ -58,12 +58,16 @@ public class ListarInvestimentosPorClienteTests : DesafioFinalCaixaversoClassFix
 
         resposta.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var historico = await resposta.Content.ReadFromJsonAsync<List<HistoricoSimulacaoJson>>(JsonOptions);
-        historico.ShouldNotBeNull();
-        var lista = historico!;
-        lista.Count.ShouldBe(1);
-        lista.Single().Id.ShouldBe(simulacaoDoCliente.Id);
-        lista.Single().ValorInvestido.ShouldBe(8_000m);
+    var investimentos = await resposta.Content.ReadFromJsonAsync<List<InvestimentoClienteJson>>(JsonOptions);
+    investimentos.ShouldNotBeNull();
+    var lista = investimentos!;
+    lista.Count.ShouldBe(1);
+    var investimento = lista.Single();
+    investimento.Id.ShouldBe(simulacaoDoCliente.Id);
+    investimento.Tipo.ShouldBe(produto.Tipo);
+    investimento.Valor.ShouldBe(simulacaoDoCliente.ValorInvestido);
+    investimento.Rentabilidade.ShouldBe(simulacaoDoCliente.RentabilidadeEfetiva);
+    investimento.Data.Date.ShouldBe(simulacaoDoCliente.DataSimulacao.Date);
     }
 
     [Fact]

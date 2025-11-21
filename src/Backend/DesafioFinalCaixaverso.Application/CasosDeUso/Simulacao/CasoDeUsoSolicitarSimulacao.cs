@@ -56,8 +56,8 @@ public class CasoDeUsoSolicitarSimulacao : ICasoDeUsoSolicitarSimulacao
             Simulacoes = simulacoes
                 .Select(par => new SimulacaoGeradaJson
                 {
-                    Produto = par.produto.Adapt<ProdutoSimuladoJson>(),
-                    Resultado = par.simulacao.Adapt<ResultadoSimulacaoJson>(),
+                    ProdutoValidado = par.produto.Adapt<ProdutoSimuladoJson>(),
+                    ResultadoSimulacao = par.simulacao.Adapt<ResultadoSimulacaoJson>(),
                     DataSimulacao = par.simulacao.DataSimulacao
                 })
                 .ToList()
