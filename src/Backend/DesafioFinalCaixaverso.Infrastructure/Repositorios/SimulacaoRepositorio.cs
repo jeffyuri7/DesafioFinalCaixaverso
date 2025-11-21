@@ -50,29 +50,49 @@ public class SimulacaoRepositorio : ISimulacaoRepositorio
 
             var agrupadoMemoria = query
                 .AsEnumerable()
-                .GroupBy(item => new { Produto = item.produto.Nome, Dia = item.simulacao.DataSimulacao.Date })
+                .GroupBy(item => new { Produto = item.produto.Nome, Data = item.simulacao.DataSimulacao.Date })
                 .Select(grupo => new SimulacoesPorProdutoDiaResultado(
                     grupo.Key.Produto,
-                    grupo.Key.Dia,
+                    grupo.Key.Data,
                     grupo.Count(),
-                    grupo.Sum(item => item.simulacao.ValorInvestido)))
-                .OrderByDescending(resultado => resultado.Dia)
+                    grupo.Average(item => item.simulacao.ValorFinal)))
+                .OrderByDescending(resultado => resultado.Data)
                 .ThenBy(resultado => resultado.Produto)
                 .ToList();
 
             return agrupadoMemoria.AsReadOnly();
         }
 
-        var agrupado = await query
-            .GroupBy(item => new { Produto = item.produto.Nome, Dia = item.simulacao.DataSimulacao.Date })
-            .Select(grupo => new SimulacoesPorProdutoDiaResultado(
+        var agrupadoSql = await query
+            .GroupBy(item => new
+            {
+                Produto = item.produto.Nome,
+                DiaOrdinal = EF.Functions.DateDiffDay(DateTime.UnixEpoch, item.simulacao.DataSimulacao)
+            })
+            .Select(grupo => new
+            {
                 grupo.Key.Produto,
-                grupo.Key.Dia,
-                grupo.Count(),
-                grupo.Sum(item => item.simulacao.ValorInvestido)))
-            .OrderByDescending(resultado => resultado.Dia)
+                grupo.Key.DiaOrdinal,
+                QuantidadeSimulacoes = grupo.Count(),
+                MediaValorFinal = grupo.Average(item => item.simulacao.ValorFinal)
+            })
+            .OrderByDescending(resultado => resultado.DiaOrdinal)
             .ThenBy(resultado => resultado.Produto)
             .ToListAsync(cancellationToken);
+
+        var agrupado = agrupadoSql
+            .Select(resultado =>
+            {
+                var diasDesdeEpoch = resultado.DiaOrdinal;
+                var dia = DateTime.UnixEpoch.AddDays(diasDesdeEpoch).Date;
+
+                return new SimulacoesPorProdutoDiaResultado(
+                    resultado.Produto,
+                    dia,
+                    resultado.QuantidadeSimulacoes,
+                    resultado.MediaValorFinal);
+            })
+            .ToList();
 
         return agrupado.AsReadOnly();
     }

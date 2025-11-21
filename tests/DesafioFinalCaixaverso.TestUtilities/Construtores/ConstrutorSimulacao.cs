@@ -53,5 +53,11 @@ public class ConstrutorSimulacao
         return this;
     }
 
+    public ConstrutorSimulacao ComValorFinal(decimal valor)
+    {
+        _simulacao.ValorFinal = valor;
+        return this;
+    }
+
     public Simulacao Construir() => _simulacao;
 }

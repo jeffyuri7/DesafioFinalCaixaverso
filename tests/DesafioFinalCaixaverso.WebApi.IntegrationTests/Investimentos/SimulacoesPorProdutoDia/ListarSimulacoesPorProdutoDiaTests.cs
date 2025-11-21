@@ -35,9 +35,9 @@ public class ListarSimulacoesPorProdutoDiaTests : DesafioFinalCaixaversoClassFix
 
         var simulacoes = new[]
         {
-            new ConstrutorSimulacao().ComProduto(produtoCdb).ComValorInvestido(5_000m).ComDataSimulacao(diaAtual).Construir(),
-            new ConstrutorSimulacao().ComProduto(produtoCdb).ComValorInvestido(7_500m).ComDataSimulacao(diaAtual).Construir(),
-            new ConstrutorSimulacao().ComProduto(produtoLci).ComValorInvestido(3_000m).ComDataSimulacao(diaAnterior).Construir()
+            new ConstrutorSimulacao().ComProduto(produtoCdb).ComValorInvestido(5_000m).ComValorFinal(5_500m).ComDataSimulacao(diaAtual).Construir(),
+            new ConstrutorSimulacao().ComProduto(produtoCdb).ComValorInvestido(7_500m).ComValorFinal(8_000m).ComDataSimulacao(diaAtual).Construir(),
+            new ConstrutorSimulacao().ComProduto(produtoLci).ComValorInvestido(3_000m).ComValorFinal(3_300m).ComDataSimulacao(diaAnterior).Construir()
         };
 
         await Factory.ExecutarNoContextoAsync(async contexto =>
@@ -55,15 +55,15 @@ public class ListarSimulacoesPorProdutoDiaTests : DesafioFinalCaixaversoClassFix
         var lista = agrupado!;
         lista.Count.ShouldBe(2);
 
-        var grupoCdb = lista.First(resultado => resultado.Produto == produtoCdb.Nome);
-        grupoCdb.Quantidade.ShouldBe(2);
-        grupoCdb.ValorTotalInvestido.ShouldBe(12_500m);
-        grupoCdb.Dia.Date.ShouldBe(diaAtual);
+    var grupoCdb = lista.First(resultado => resultado.Produto == produtoCdb.Nome);
+    grupoCdb.QuantidadeSimulacoes.ShouldBe(2);
+    grupoCdb.MediaValorFinal.ShouldBe(6_750m);
+    grupoCdb.Data.Date.ShouldBe(diaAtual);
 
-        var grupoLci = lista.First(resultado => resultado.Produto == produtoLci.Nome);
-        grupoLci.Quantidade.ShouldBe(1);
-        grupoLci.ValorTotalInvestido.ShouldBe(3_000m);
-        grupoLci.Dia.Date.ShouldBe(diaAnterior);
+    var grupoLci = lista.First(resultado => resultado.Produto == produtoLci.Nome);
+    grupoLci.QuantidadeSimulacoes.ShouldBe(1);
+    grupoLci.MediaValorFinal.ShouldBe(3_300m);
+    grupoLci.Data.Date.ShouldBe(diaAnterior);
     }
 
     [Fact]

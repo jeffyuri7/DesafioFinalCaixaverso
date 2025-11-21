@@ -43,12 +43,12 @@ public class CasoDeUsoConsultarSimulacoesPorProdutoDiaTestes
         var resposta = await casoDeUso.Executar();
 
         resposta.Count.ShouldBe(2);
-        var lci = resposta.First(r => r.Produto == "LCI");
-        lci.Quantidade.ShouldBe(3);
-        lci.ValorTotalInvestido.ShouldBe(12_000m);
+    var lci = resposta.First(r => r.Produto == "LCI");
+    lci.QuantidadeSimulacoes.ShouldBe(3);
+    lci.MediaValorFinal.ShouldBe(12_000m);
 
-        var cdb = resposta.First(r => r.Produto == "CDB");
-        cdb.Quantidade.ShouldBe(1);
-        cdb.ValorTotalInvestido.ShouldBe(2_500m);
+    var cdb = resposta.First(r => r.Produto == "CDB");
+    cdb.QuantidadeSimulacoes.ShouldBe(1);
+    cdb.MediaValorFinal.ShouldBe(2_500m);
     }
 }

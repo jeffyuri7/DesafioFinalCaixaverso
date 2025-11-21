@@ -3,7 +3,7 @@ namespace DesafioFinalCaixaverso.Communications.Responses;
 public class SimulacoesPorProdutoDiaJson
 {
     public string Produto { get; set; } = string.Empty;
-    public DateTime Dia { get; set; }
-    public int Quantidade { get; set; }
-    public decimal ValorTotalInvestido { get; set; }
+    public DateTime Data { get; set; }
+    public int QuantidadeSimulacoes { get; set; }
+    public decimal MediaValorFinal { get; set; }
 }
