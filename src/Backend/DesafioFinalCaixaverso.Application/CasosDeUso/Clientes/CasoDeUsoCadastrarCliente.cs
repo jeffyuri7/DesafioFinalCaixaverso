@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Communications.Requests;
 using DesafioFinalCaixaverso.Communications.Responses;
 using DesafioFinalCaixaverso.Dominio.Entidades;
+using DesafioFinalCaixaverso.Dominio.Enumeradores;
 using DesafioFinalCaixaverso.Dominio.Repositorios;
 using DesafioFinalCaixaverso.Dominio.Seguranca;
 using DesafioFinalCaixaverso.Exceptions.ExceptionsBase;
@@ -16,15 +17,18 @@ namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Clientes;
 public class CasoDeUsoCadastrarCliente : ICasoDeUsoCadastrarCliente
 {
     private readonly IClienteRepositorio _clienteRepositorio;
+    private readonly IClientePerfilDinamicoRepositorio _clientePerfilDinamicoRepositorio;
     private readonly IUnidadeDeTrabalho _unidadeDeTrabalho;
     private readonly IServicoHashSenha _servicoHashSenha;
 
     public CasoDeUsoCadastrarCliente(
         IClienteRepositorio clienteRepositorio,
+        IClientePerfilDinamicoRepositorio clientePerfilDinamicoRepositorio,
         IUnidadeDeTrabalho unidadeDeTrabalho,
         IServicoHashSenha servicoHashSenha)
     {
         _clienteRepositorio = clienteRepositorio;
+        _clientePerfilDinamicoRepositorio = clientePerfilDinamicoRepositorio;
         _unidadeDeTrabalho = unidadeDeTrabalho;
         _servicoHashSenha = servicoHashSenha;
     }
@@ -48,9 +52,31 @@ public class CasoDeUsoCadastrarCliente : ICasoDeUsoCadastrarCliente
         cliente.DataCriacao = DateTime.UtcNow;
 
         await _clienteRepositorio.AdicionarAsync(cliente, cancellationToken);
+        await SincronizarPerfilDinamicoInicial(cliente.Id, cancellationToken);
         await _unidadeDeTrabalho.Commit();
 
         return cliente.Adapt<ClienteCadastradoJson>();
+    }
+
+    private async Task SincronizarPerfilDinamicoInicial(Guid clienteId, CancellationToken cancellationToken)
+    {
+        var perfilExistente = await _clientePerfilDinamicoRepositorio.ObterPorClienteAsync(clienteId, cancellationToken);
+        if (perfilExistente is not null)
+            return;
+
+        var perfilInicial = new ClientePerfilDinamico
+        {
+            Id = Guid.NewGuid(),
+            ClienteId = clienteId,
+            Perfil = PerfilInvestidor.NaoClassificado,
+            Pontuacao = 0,
+            VolumeTotalInvestido = 0m,
+            FrequenciaMovimentacoes = 0,
+            PreferenciaLiquidez = true,
+            AtualizadoEm = DateTime.UtcNow
+        };
+
+        await _clientePerfilDinamicoRepositorio.AdicionarAsync(perfilInicial, cancellationToken);
     }
 
     private static async Task Validar(RequisicaoCadastroClienteJson requisicao)

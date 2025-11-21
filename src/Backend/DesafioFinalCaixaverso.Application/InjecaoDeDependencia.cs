@@ -25,9 +25,12 @@ public static class InjecaoDeDependencia
         services.AddScoped<ICasoDeUsoConsultarInvestimentosCliente, CasoDeUsoConsultarInvestimentosCliente>();
         services.AddScoped<ICasoDeUsoConsultarTelemetriaServicos, CasoDeUsoConsultarTelemetriaServicos>();
         services.AddScoped<IRegistradorTelemetriaServicos, RegistradorTelemetriaServicos>();
-        services.AddScoped<ICasoDeUsoConsultarPerfilCliente, CasoDeUsoConsultarPerfilCliente>();
+        services.AddScoped<ICasoDeUsoConsultarPerfilInicialCliente, CasoDeUsoConsultarPerfilInicialCliente>();
+        services.AddScoped<ICasoDeUsoConsultarPerfilDinamicoCliente, CasoDeUsoConsultarPerfilDinamicoCliente>();
         services.AddScoped<ICasoDeUsoListarProdutosRecomendados, CasoDeUsoListarProdutosRecomendados>();
         services.AddScoped<ICalculadoraPerfilInvestidor, CalculadoraPerfilInvestidor>();
+        services.AddScoped<ICalculadoraPerfilDinamico, CalculadoraPerfilDinamico>();
+        services.AddScoped<ICasoDeUsoAtualizarPerfilDinamicoCliente, CasoDeUsoAtualizarPerfilDinamicoCliente>();
         services.AddScoped<ICasoDeUsoCadastrarCliente, CasoDeUsoCadastrarCliente>();
         services.AddScoped<ICasoDeUsoResponderQuestionarioCliente, CasoDeUsoResponderQuestionarioCliente>();
         services.AddScoped<ICasoDeUsoListarClientes, CasoDeUsoListarClientes>();

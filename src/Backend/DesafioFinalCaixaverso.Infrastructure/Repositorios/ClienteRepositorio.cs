@@ -61,9 +61,17 @@ public class ClienteRepositorio : IClienteRepositorio
         return Task.CompletedTask;
     }
 
-    public Task RemoverAsync(Cliente cliente, CancellationToken cancellationToken = default)
+    public async Task RemoverAsync(Cliente cliente, CancellationToken cancellationToken = default)
     {
+        var perfilDinamico = await _dbContext
+            .ClientePerfisDinamicos
+            .FirstOrDefaultAsync(perfil => perfil.ClienteId == cliente.Id, cancellationToken);
+
+        if (perfilDinamico is not null)
+        {
+            _dbContext.ClientePerfisDinamicos.Remove(perfilDinamico);
+        }
+
         _dbContext.Clientes.Remove(cliente);
-        return Task.CompletedTask;
     }
 }

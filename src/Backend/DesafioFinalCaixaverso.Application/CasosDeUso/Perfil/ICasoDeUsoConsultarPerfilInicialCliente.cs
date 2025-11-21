@@ -5,7 +5,7 @@ using DesafioFinalCaixaverso.Communications.Responses;
 
 namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Perfil;
 
-public interface ICasoDeUsoConsultarPerfilCliente
+public interface ICasoDeUsoConsultarPerfilInicialCliente
 {
     Task<PerfilClienteJson> Executar(Guid clienteId, CancellationToken cancellationToken = default);
 }

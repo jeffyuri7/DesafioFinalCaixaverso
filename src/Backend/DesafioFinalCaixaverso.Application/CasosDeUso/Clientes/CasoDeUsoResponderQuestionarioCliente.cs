@@ -2,9 +2,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DesafioFinalCaixaverso.Aplicacao.Servicos.Perfis;
 using DesafioFinalCaixaverso.Communications.Requests;
 using DesafioFinalCaixaverso.Communications.Responses;
 using DesafioFinalCaixaverso.Dominio.Entidades;
+using DesafioFinalCaixaverso.Dominio.Enumeradores;
 using DesafioFinalCaixaverso.Dominio.Repositorios;
 using DesafioFinalCaixaverso.Exceptions;
 using DesafioFinalCaixaverso.Exceptions.ExceptionsBase;
@@ -16,15 +18,24 @@ public class CasoDeUsoResponderQuestionarioCliente : ICasoDeUsoResponderQuestion
 {
     private readonly IClienteRepositorio _clienteRepositorio;
     private readonly IQuestionarioInvestidorRepositorio _questionarioRepositorio;
+    private readonly IClientePerfilDinamicoRepositorio _clientePerfilDinamicoRepositorio;
+    private readonly IClientePerfilRepositorio _clientePerfilRepositorio;
+    private readonly ICalculadoraPerfilInvestidor _calculadoraPerfilInvestidor;
     private readonly IUnidadeDeTrabalho _unidadeDeTrabalho;
 
     public CasoDeUsoResponderQuestionarioCliente(
         IClienteRepositorio clienteRepositorio,
         IQuestionarioInvestidorRepositorio questionarioRepositorio,
+        IClientePerfilDinamicoRepositorio clientePerfilDinamicoRepositorio,
+        IClientePerfilRepositorio clientePerfilRepositorio,
+        ICalculadoraPerfilInvestidor calculadoraPerfilInvestidor,
         IUnidadeDeTrabalho unidadeDeTrabalho)
     {
         _clienteRepositorio = clienteRepositorio;
         _questionarioRepositorio = questionarioRepositorio;
+        _clientePerfilDinamicoRepositorio = clientePerfilDinamicoRepositorio;
+        _clientePerfilRepositorio = clientePerfilRepositorio;
+        _calculadoraPerfilInvestidor = calculadoraPerfilInvestidor;
         _unidadeDeTrabalho = unidadeDeTrabalho;
     }
 
@@ -55,9 +66,53 @@ public class CasoDeUsoResponderQuestionarioCliente : ICasoDeUsoResponderQuestion
             await _questionarioRepositorio.AtualizarAsync(questionario, cancellationToken);
         }
 
+    await SincronizarPerfilQuestionario(clienteId, questionario, cancellationToken);
+    await SincronizarPerfilDinamicoInicial(clienteId, cancellationToken);
         await _unidadeDeTrabalho.Commit();
 
         return questionario.Adapt<QuestionarioRespondidoJson>();
+    }
+
+    private async Task SincronizarPerfilDinamicoInicial(Guid clienteId, CancellationToken cancellationToken)
+    {
+        var perfilExistente = await _clientePerfilDinamicoRepositorio.ObterPorClienteAsync(clienteId, cancellationToken);
+        if (perfilExistente is not null)
+        {
+            perfilExistente.AtualizadoEm = DateTime.UtcNow;
+            await _clientePerfilDinamicoRepositorio.AtualizarAsync(perfilExistente, cancellationToken);
+            return;
+        }
+
+        var perfilInicial = new ClientePerfilDinamico
+        {
+            Id = Guid.NewGuid(),
+            ClienteId = clienteId,
+            Perfil = PerfilInvestidor.NaoClassificado,
+            Pontuacao = 0,
+            VolumeTotalInvestido = 0m,
+            FrequenciaMovimentacoes = 0,
+            PreferenciaLiquidez = true,
+            AtualizadoEm = DateTime.UtcNow
+        };
+
+        await _clientePerfilDinamicoRepositorio.AdicionarAsync(perfilInicial, cancellationToken);
+    }
+
+    private async Task SincronizarPerfilQuestionario(Guid clienteId, QuestionarioInvestidor questionario, CancellationToken cancellationToken)
+    {
+        var resultado = _calculadoraPerfilInvestidor.Calcular(clienteId, Array.Empty<Simulacao>(), questionario);
+        var perfilExistente = await _clientePerfilRepositorio.ObterPorClienteAsync(clienteId, cancellationToken);
+
+        if (perfilExistente is null)
+        {
+            var entidade = resultado.Adapt<ClientePerfil>();
+            entidade.Id = Guid.NewGuid();
+            await _clientePerfilRepositorio.AdicionarAsync(entidade, cancellationToken);
+            return;
+        }
+
+        resultado.Adapt(perfilExistente);
+        await _clientePerfilRepositorio.AtualizarAsync(perfilExistente, cancellationToken);
     }
 
     private static async Task Validar(RequisicaoQuestionarioClienteJson requisicao)

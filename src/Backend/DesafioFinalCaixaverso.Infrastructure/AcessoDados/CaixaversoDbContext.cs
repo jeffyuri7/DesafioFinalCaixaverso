@@ -12,6 +12,7 @@ public class CaixaversoDbContext : DbContext
     public DbSet<TelemetriaServico> TelemetriaServicos { get; set; }
     public DbSet<ClientePerfil> ClientePerfis { get; set; }
     public DbSet<QuestionarioInvestidor> QuestionariosInvestidor { get; set; }
+    public DbSet<ClientePerfilDinamico> ClientePerfisDinamicos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,6 +54,17 @@ public class CaixaversoDbContext : DbContext
             builder.Property(questionario => questionario.RendaMensal).HasPrecision(18, 2);
             builder.Property(questionario => questionario.PatrimonioTotal).HasPrecision(18, 2);
             builder.Property(questionario => questionario.ToleranciaPerdaPercentual).HasPrecision(5, 2);
+        });
+
+        modelBuilder.Entity<ClientePerfilDinamico>(builder =>
+        {
+            builder.HasIndex(perfil => perfil.ClienteId).IsUnique();
+            builder.Property(perfil => perfil.Pontuacao).HasPrecision(5, 2);
+            builder.Property(perfil => perfil.VolumeTotalInvestido).HasPrecision(18, 2);
+            builder.HasOne(perfil => perfil.Cliente)
+                .WithMany()
+                .HasForeignKey(perfil => perfil.ClienteId)
+                .OnDelete(DeleteBehavior.ClientCascade);
         });
     }
 }
