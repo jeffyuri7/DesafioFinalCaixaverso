@@ -41,7 +41,7 @@ public class CalculadoraPerfilInvestidor : ICalculadoraPerfilInvestidor
                 2,
                 MidpointRounding.AwayFromZero);
 
-        var perfilCalculado = MapearPerfil(pontuacaoFinal);
+    var perfilCalculado = PerfilPontuacaoHelper.MapearPerfil(pontuacaoFinal);
         var perfilFinal = permiteRecomendacao ? perfilCalculado : PerfilInvestidor.NaoClassificado;
 
         var observacao = permiteRecomendacao
@@ -120,7 +120,7 @@ public class CalculadoraPerfilInvestidor : ICalculadoraPerfilInvestidor
             ? (int)Math.Round(produtos.Average(produto => produto.LiquidezDias), MidpointRounding.AwayFromZero)
             : 0;
 
-        var nota = CalcularNotaComportamental(valorTotal, quantidade, rentabilidadeMedia, liquidezMediaDias);
+    var nota = PerfilPontuacaoHelper.CalcularNotaComportamental(valorTotal, quantidade, rentabilidadeMedia, liquidezMediaDias);
 
         return new DimensaoComportamental(
             true,
@@ -131,63 +131,6 @@ public class CalculadoraPerfilInvestidor : ICalculadoraPerfilInvestidor
             rentabilidadeMedia,
             liquidezMediaDias);
     }
-
-    private static decimal CalcularNotaComportamental(decimal valorTotal, int quantidade, decimal rentabilidadeMedia, int liquidezMediaDias)
-    {
-        var volumeNota = valorTotal switch
-        {
-            >= 500000m => 95m,
-            >= 100000m => 80m,
-            >= 20000m => 60m,
-            >= 5000m => 40m,
-            > 0 => 25m,
-            _ => 0m
-        };
-
-        var frequenciaNota = quantidade switch
-        {
-            >= 24 => 95m,
-            >= 12 => 75m,
-            >= 6 => 55m,
-            >= 3 => 35m,
-            > 0 => 20m,
-            _ => 0m
-        };
-
-        var rentabilidadeNota = rentabilidadeMedia switch
-        {
-            >= 0.18m => 95m,
-            >= 0.12m => 75m,
-            >= 0.08m => 55m,
-            >= 0.05m => 35m,
-            > 0m => 20m,
-            _ => 0m
-        };
-
-        var liquidezNota = liquidezMediaDias switch
-        {
-            >= 180 => 90m,
-            >= 90 => 70m,
-            >= 30 => 50m,
-            >= 7 => 30m,
-            > 0 => 15m,
-            _ => 0m
-        };
-
-        const decimal pesoVolume = 0.35m;
-        const decimal pesoFrequencia = 0.25m;
-        const decimal pesoRentabilidade = 0.2m;
-        const decimal pesoLiquidez = 0.2m;
-
-        return decimal.Round(
-            (volumeNota * pesoVolume) +
-            (frequenciaNota * pesoFrequencia) +
-            (rentabilidadeNota * pesoRentabilidade) +
-            (liquidezNota * pesoLiquidez),
-            2,
-            MidpointRounding.AwayFromZero);
-    }
-
     private static DimensaoQuestionario CalcularDimensaoQuestionario(QuestionarioInvestidor? questionario)
     {
         if (questionario is null)
@@ -278,17 +221,6 @@ public class CalculadoraPerfilInvestidor : ICalculadoraPerfilInvestidor
         var estabilidadeNota = fonteRendaEstavel ? 70m : 30m;
 
         return decimal.Round((rendaNota * 0.4m) + (patrimonioNota * 0.4m) + (estabilidadeNota * 0.2m), 2, MidpointRounding.AwayFromZero);
-    }
-
-    private static PerfilInvestidor MapearPerfil(decimal pontuacaoFinal)
-    {
-        if (pontuacaoFinal <= 40)
-            return PerfilInvestidor.Conservador;
-
-        if (pontuacaoFinal <= 70)
-            return PerfilInvestidor.Moderado;
-
-        return PerfilInvestidor.Agressivo;
     }
 
     private readonly record struct DimensaoComportamental(

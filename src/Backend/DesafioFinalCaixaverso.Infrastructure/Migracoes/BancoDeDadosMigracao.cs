@@ -39,7 +39,8 @@ public static class BancoDeDadosMigracao
         if (!registros.Any())
         {
             var nomeEscapado = ObterNomeEscapado(conexao, nomeBancoDeDados);
-            conexao.Execute($"CREATE DATABASE {nomeEscapado}");
+            const string comandoSeguro = "DECLARE @sql NVARCHAR(MAX) = 'CREATE DATABASE ' + @nomeEscapado; EXEC(@sql);";
+            conexao.Execute(comandoSeguro, new { nomeEscapado });
         }
     }
 
