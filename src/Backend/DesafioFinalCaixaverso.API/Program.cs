@@ -98,9 +98,10 @@ builder.Services.RegistrarInfraestrutura(builder.Configuration, builder.Environm
 
 builder.Services.AddRouting(opcoes => opcoes.LowercaseUrls = true);
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -115,6 +116,16 @@ app.UseAuthorization();
 app.UseMiddleware<RegistroTelemetriaMiddleware>();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    AllowCachingResponses = false,
+    ResultStatusCodes =
+    {
+        [Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
+});
 
 MigrarBancoDeDados();
 

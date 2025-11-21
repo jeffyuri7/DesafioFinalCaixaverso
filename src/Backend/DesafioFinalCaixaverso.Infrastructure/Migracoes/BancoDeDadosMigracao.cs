@@ -9,7 +9,10 @@ namespace DesafioFinalCaixaverso.Infraestrutura.Migracoes;
 
 public static class BancoDeDadosMigracao
 {
-    private static readonly Regex NomeBancoPermitidoRegex = new("^[A-Za-z0-9_]+$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex NomeBancoPermitidoRegex = new(
+        "^[A-Za-z0-9_]+$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1));
 
     public static void Migracao(string connectionString, IServiceProvider serviceProvider)
     {
