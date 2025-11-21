@@ -4,7 +4,6 @@ using DesafioFinalCaixaverso.Infraestrutura.AcessoDados;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -13,8 +12,6 @@ namespace DesafioFinalCaixaverso.WebApi.IntegrationTests;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly InMemoryDatabaseRoot _databaseRoot = new();
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -30,15 +27,18 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll(typeof(DbContextOptions<CaixaversoDbContext>));
             services.RemoveAll(typeof(CaixaversoDbContext));
 
+            var provider = services.AddEntityFrameworkInMemoryDatabase().BuildServiceProvider();
+
             services.AddDbContext<CaixaversoDbContext>(options =>
             {
-                options.UseInMemoryDatabase("CaixaversoTests", _databaseRoot);
+                options.UseInMemoryDatabase("CaixaversoTests");
+                options.UseInternalServiceProvider(provider);
             });
 
             using var serviceProvider = services.BuildServiceProvider();
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<CaixaversoDbContext>();
-            dbContext.Database.EnsureCreated();
+            dbContext.Database.EnsureDeleted();
         });
     }
 

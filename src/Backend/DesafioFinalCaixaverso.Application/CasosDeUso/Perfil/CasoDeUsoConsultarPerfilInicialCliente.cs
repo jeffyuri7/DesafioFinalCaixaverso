@@ -16,6 +16,7 @@ public class CasoDeUsoConsultarPerfilInicialCliente : ICasoDeUsoConsultarPerfilI
     private readonly IClienteRepositorio _clienteRepositorio;
     private readonly IClientePerfilRepositorio _clientePerfilRepositorio;
     private readonly IQuestionarioInvestidorRepositorio _questionarioRepositorio;
+    private readonly ISimulacaoRepositorio _simulacaoRepositorio;
     private readonly ICalculadoraPerfilInvestidor _calculadoraPerfilInvestidor;
     private readonly IUnidadeDeTrabalho _unidadeDeTrabalho;
 
@@ -23,12 +24,14 @@ public class CasoDeUsoConsultarPerfilInicialCliente : ICasoDeUsoConsultarPerfilI
         IClienteRepositorio clienteRepositorio,
         IClientePerfilRepositorio clientePerfilRepositorio,
         IQuestionarioInvestidorRepositorio questionarioRepositorio,
+        ISimulacaoRepositorio simulacaoRepositorio,
         ICalculadoraPerfilInvestidor calculadoraPerfilInvestidor,
         IUnidadeDeTrabalho unidadeDeTrabalho)
     {
         _clienteRepositorio = clienteRepositorio;
         _clientePerfilRepositorio = clientePerfilRepositorio;
         _questionarioRepositorio = questionarioRepositorio;
+        _simulacaoRepositorio = simulacaoRepositorio;
         _calculadoraPerfilInvestidor = calculadoraPerfilInvestidor;
         _unidadeDeTrabalho = unidadeDeTrabalho;
     }
@@ -46,7 +49,8 @@ public class CasoDeUsoConsultarPerfilInicialCliente : ICasoDeUsoConsultarPerfilI
             return perfilExistente.Adapt<PerfilClienteJson>();
 
         var questionario = await _questionarioRepositorio.ObterPorClienteAsync(clienteId, cancellationToken);
-        var resultado = _calculadoraPerfilInvestidor.Calcular(clienteId, Array.Empty<Simulacao>(), questionario);
+        var simulacoes = await _simulacaoRepositorio.ListarPorClienteAsync(clienteId, cancellationToken);
+        var resultado = _calculadoraPerfilInvestidor.Calcular(clienteId, simulacoes, questionario);
         var perfil = await PersistirPerfil(resultado, cancellationToken);
 
         return perfil.Adapt<PerfilClienteJson>();

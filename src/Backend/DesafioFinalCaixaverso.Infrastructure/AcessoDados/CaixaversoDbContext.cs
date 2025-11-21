@@ -46,6 +46,7 @@ public class CaixaversoDbContext : DbContext
             builder.Property(perfil => perfil.PontuacaoQuestionario).HasPrecision(5, 2);
             builder.Property(perfil => perfil.MetodoCalculo).HasMaxLength(100);
             builder.Property(perfil => perfil.Observacoes).HasMaxLength(500);
+            builder.Property(perfil => perfil.DadosSuficientes).HasDefaultValue(false);
         });
 
         modelBuilder.Entity<QuestionarioInvestidor>(builder =>

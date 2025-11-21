@@ -10,11 +10,13 @@ public class ConstrutorSimulacao
 
     public ConstrutorSimulacao()
     {
+        var cliente = new ConstrutorCliente().Construir();
         var produto = new ConstrutorProduto().Construir();
 
         _simulacao = new Faker<Simulacao>("pt_BR")
             .RuleFor(s => s.Id, _ => Guid.NewGuid())
-            .RuleFor(s => s.ClienteId, _ => Guid.NewGuid())
+            .RuleFor(s => s.ClienteId, _ => cliente.Id)
+            .RuleFor(s => s.Cliente, _ => cliente)
             .RuleFor(s => s.ProdutoId, _ => produto.Id)
             .RuleFor(s => s.Produto, _ => produto)
             .RuleFor(s => s.ValorInvestido, faker => faker.Finance.Amount(1_000, 10_000))
@@ -35,6 +37,7 @@ public class ConstrutorSimulacao
     public ConstrutorSimulacao ComClienteId(Guid clienteId)
     {
         _simulacao.ClienteId = clienteId;
+        _simulacao.Cliente = null;
         return this;
     }
 

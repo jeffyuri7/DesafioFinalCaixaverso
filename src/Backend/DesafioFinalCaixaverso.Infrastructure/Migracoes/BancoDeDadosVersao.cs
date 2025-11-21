@@ -9,5 +9,5 @@ public abstract class BancoDeDadosVersao
     public const int TABELA_CLIENTE_PERFIL = 5;
     public const int TABELA_QUESTIONARIO_INVESTIDOR = 6;
     public const int TABELA_CLIENTE_PERFIL_DINAMICO = 7;
-    
+    public const int AJUSTE_CLIENTE_PERFIL_DADOS_SUFICIENTES = 8;
 }

@@ -73,6 +73,10 @@ public class ResponderQuestionarioTests : DesafioFinalCaixaversoClassFixture
             questionario.PatrimonioTotal.ShouldBe(450_000m);
             questionario.ToleranciaPerdaPercentual.ShouldBe(25m);
             questionario.FonteRendaEstavel.ShouldBeTrue();
+
+            var perfil = await contexto.ClientePerfis.SingleAsync();
+            perfil.ClienteId.ShouldBe(cliente.Id);
+            perfil.PontuacaoQuestionario.ShouldBeGreaterThan(0);
         });
     }
 
@@ -129,6 +133,10 @@ public class ResponderQuestionarioTests : DesafioFinalCaixaversoClassFixture
             questionario.PatrimonioTotal.ShouldBe(120_000m);
             questionario.ToleranciaPerdaPercentual.ShouldBe(12m);
             questionario.FonteRendaEstavel.ShouldBeTrue();
+
+            var perfil = await contexto.ClientePerfis.SingleAsync();
+            perfil.ClienteId.ShouldBe(cliente.Id);
+            perfil.AtualizadoEm.ShouldBeGreaterThan(DateTime.UtcNow.AddMinutes(-5));
         });
     }
 

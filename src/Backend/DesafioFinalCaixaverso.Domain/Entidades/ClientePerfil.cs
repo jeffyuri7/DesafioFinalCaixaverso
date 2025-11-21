@@ -20,6 +20,7 @@ public class ClientePerfil
     public string MetodoCalculo { get; set; } = string.Empty;
     public string Observacoes { get; set; } = string.Empty;
     public DateTime AtualizadoEm { get; set; }
+    public bool DadosSuficientes { get; set; }
 
     public Cliente? Cliente { get; set; }
 }

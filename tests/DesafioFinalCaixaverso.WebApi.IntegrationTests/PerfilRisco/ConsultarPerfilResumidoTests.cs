@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Communications.Responses;
+using DesafioFinalCaixaverso.Dominio.Entidades;
 using DesafioFinalCaixaverso.Dominio.Enumeradores;
 using DesafioFinalCaixaverso.Exceptions;
 using DesafioFinalCaixaverso.TestUtilities.Construtores;
@@ -29,51 +28,27 @@ public class ConsultarPerfilResumidoTests : DesafioFinalCaixaversoClassFixture
     }
 
     [Fact]
-    public async Task Deve_retornar_perfil_resumido_com_descricao()
+    public async Task Deve_retornar_resumo_dos_dados_persistidos()
     {
         await Factory.ResetDatabaseAsync();
 
         var cliente = new ConstrutorCliente().Construir();
-        var questionario = new ConstrutorQuestionarioInvestidor()
-            .ComClienteId(cliente.Id)
-            .ComHorizonteMeses(60)
-            .ComRendaMensal(20_000m)
-            .ComPatrimonioTotal(800_000m)
-            .ComPreferenciaLiquidez(PreferenciaLiquidez.Baixa)
-            .ComObjetivoInvestimento(ObjetivoInvestimento.Crescimento)
-            .ComNivelConhecimento(NivelConhecimentoInvestidor.Avancado)
-            .ComToleranciaPerdaPercentual(30m)
-            .ComFonteRendaEstavel(true)
-            .Construir();
-
-        var produto = new ConstrutorProduto()
-            .ComNome("CDB Performance")
-            .ComRentabilidade(0.18m)
-            .ComLiquidezDias(15)
-            .Construir();
-
-        var simulacoes = new[]
+        var perfilDinamico = new ClientePerfilDinamico
         {
-            new ConstrutorSimulacao()
-                .ComClienteId(cliente.Id)
-                .ComProduto(produto)
-                .ComValorInvestido(25_000m)
-                .ComDataSimulacao(DateTime.UtcNow.AddDays(-10))
-                .Construir(),
-            new ConstrutorSimulacao()
-                .ComClienteId(cliente.Id)
-                .ComProduto(produto)
-                .ComValorInvestido(18_000m)
-                .ComDataSimulacao(DateTime.UtcNow.AddDays(-40))
-                .Construir()
+            Id = Guid.NewGuid(),
+            ClienteId = cliente.Id,
+            Perfil = PerfilInvestidor.Moderado,
+            Pontuacao = 72.4m,
+            VolumeTotalInvestido = 50_000m,
+            FrequenciaMovimentacoes = 4,
+            PreferenciaLiquidez = false,
+            AtualizadoEm = DateTime.UtcNow.AddDays(-1)
         };
 
         await Factory.ExecutarNoContextoAsync(async contexto =>
         {
             await contexto.Clientes.AddAsync(cliente);
-            await contexto.Produtos.AddAsync(produto);
-            await contexto.QuestionariosInvestidor.AddAsync(questionario);
-            await contexto.Simulacoes.AddRangeAsync(simulacoes);
+            await contexto.ClientePerfisDinamicos.AddAsync(perfilDinamico);
         });
 
         var token = GerarToken(cliente.Id);
@@ -81,16 +56,19 @@ public class ConsultarPerfilResumidoTests : DesafioFinalCaixaversoClassFixture
 
         resposta.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var resumo = await resposta.Content.ReadFromJsonAsync<PerfilClienteResumoJson>(JsonOptions);
-        resumo.ShouldNotBeNull();
-        resumo!.ClienteId.ShouldBe(cliente.Id);
-        resumo.Pontuacao.ShouldBeGreaterThan(0);
-        resumo.Descricao.ShouldBe(DescricaoEsperada(resumo.Perfil));
+        var perfil = await resposta.Content.ReadFromJsonAsync<PerfilClienteResumoJson>(JsonOptions);
+        perfil.ShouldNotBeNull();
+        perfil!.ClienteId.ShouldBe(cliente.Id);
+        perfil.Perfil.ShouldBe(nameof(PerfilInvestidor.Moderado));
+        perfil.Pontuacao.ShouldBe((int)Math.Round(perfilDinamico.Pontuacao, MidpointRounding.AwayFromZero));
+        perfil.Descricao.ShouldBe("Equilibra segurança e rentabilidade, aceitando riscos moderados para alcançar ganhos consistentes.");
 
         await Factory.ExecutarNoContextoAsync(async contexto =>
         {
-            var perfilPersistido = await contexto.ClientePerfis.SingleAsync();
+            var perfilPersistido = await contexto.ClientePerfisDinamicos.SingleAsync();
             perfilPersistido.ClienteId.ShouldBe(cliente.Id);
+            perfilPersistido.Pontuacao.ShouldBe(perfilDinamico.Pontuacao);
+            perfilPersistido.AtualizadoEm.ShouldBe(perfilDinamico.AtualizadoEm);
         });
     }
 
@@ -122,17 +100,4 @@ public class ConsultarPerfilResumidoTests : DesafioFinalCaixaversoClassFixture
             .ToList();
     }
 
-    private static string DescricaoEsperada(string? perfil)
-    {
-        if (string.IsNullOrWhiteSpace(perfil))
-            return "Perfil ainda não classificado.";
-
-        return perfil.ToLowerInvariant() switch
-        {
-            "conservador" => "Perfil voltado para preservar o capital e garantir liquidez.",
-            "moderado" => "Perfil equilibrado entre segurança e rentabilidade.",
-            "agressivo" => "Perfil que aceita maior volatilidade em busca de retorno.",
-            _ => "Perfil ainda não classificado."
-        };
-    }
 }

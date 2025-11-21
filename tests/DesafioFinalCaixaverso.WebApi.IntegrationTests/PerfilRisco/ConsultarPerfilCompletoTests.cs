@@ -7,6 +7,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DesafioFinalCaixaverso.Communications.Responses;
+using DesafioFinalCaixaverso.Dominio.Entidades;
 using DesafioFinalCaixaverso.Dominio.Enumeradores;
 using DesafioFinalCaixaverso.Exceptions;
 using DesafioFinalCaixaverso.TestUtilities.Construtores;
@@ -18,7 +19,7 @@ namespace DesafioFinalCaixaverso.WebApi.IntegrationTests.PerfilRisco;
 
 public class ConsultarPerfilCompletoTests : DesafioFinalCaixaversoClassFixture
 {
-    private const string RotaBase = "v1/perfil-risco-completo";
+    private const string RotaBase = "v1/perfil-risco-inicial";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
         PropertyNameCaseInsensitive = true
@@ -26,6 +27,57 @@ public class ConsultarPerfilCompletoTests : DesafioFinalCaixaversoClassFixture
 
     public ConsultarPerfilCompletoTests(CustomWebApplicationFactory factory) : base(factory)
     {
+    }
+
+    [Fact]
+    public async Task Deve_retornar_snapshot_quando_registro_ja_existir()
+    {
+        await Factory.ResetDatabaseAsync();
+
+        var cliente = new ConstrutorCliente().Construir();
+        var perfilExistente = new ClientePerfil
+        {
+            Id = Guid.NewGuid(),
+            ClienteId = cliente.Id,
+            Perfil = PerfilInvestidor.Moderado,
+            Pontuacao = 68,
+            ValorMedioInvestido = 10_000m,
+            ValorTotalInvestido = 80_000m,
+            SimulacoesUltimos30Dias = 2,
+            RentabilidadeMediaProduto = 0.12m,
+            LiquidezMediaDias = 15,
+            PontuacaoComportamental = 40,
+            PontuacaoQuestionario = 60,
+            PermiteRecomendacao = true,
+            MetodoCalculo = "snapshot_teste",
+            Observacoes = "copiado",
+            AtualizadoEm = DateTime.UtcNow.AddDays(-2),
+            DadosSuficientes = true
+        };
+
+        await Factory.ExecutarNoContextoAsync(async contexto =>
+        {
+            await contexto.Clientes.AddAsync(cliente);
+            await contexto.ClientePerfis.AddAsync(perfilExistente);
+        });
+
+        var token = GerarToken(cliente.Id);
+        var resposta = await DoGet($"{RotaBase}/{cliente.Id}", token);
+
+        resposta.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var perfil = await resposta.Content.ReadFromJsonAsync<PerfilClienteJson>(JsonOptions);
+        perfil.ShouldNotBeNull();
+        perfil!.ClienteId.ShouldBe(cliente.Id);
+        perfil.Pontuacao.ShouldBe(perfilExistente.Pontuacao);
+        perfil.MetodoCalculo.ShouldBe(perfilExistente.MetodoCalculo);
+        perfil.Observacoes.ShouldBe(perfilExistente.Observacoes);
+
+        await Factory.ExecutarNoContextoAsync(async contexto =>
+        {
+            var registro = await contexto.ClientePerfis.SingleAsync();
+            registro.Id.ShouldBe(perfilExistente.Id);
+        });
     }
 
     [Fact]

@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DesafioFinalCaixaverso.Dominio.Entidades;
+using DesafioFinalCaixaverso.Dominio.Enumeradores;
 using DesafioFinalCaixaverso.Exceptions;
 using DesafioFinalCaixaverso.TestUtilities.Construtores;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,17 @@ public class ExcluirClienteTests : DesafioFinalCaixaversoClassFixture
         await Factory.ExecutarNoContextoAsync(async contexto =>
         {
             await contexto.Clientes.AddAsync(cliente);
+            await contexto.ClientePerfisDinamicos.AddAsync(new ClientePerfilDinamico
+            {
+                Id = Guid.NewGuid(),
+                ClienteId = cliente.Id,
+                Perfil = PerfilInvestidor.Conservador,
+                Pontuacao = 0,
+                VolumeTotalInvestido = 0,
+                FrequenciaMovimentacoes = 0,
+                PreferenciaLiquidez = true,
+                AtualizadoEm = DateTime.UtcNow
+            });
         });
 
         var token = GerarToken(cliente.Id);
@@ -39,8 +52,11 @@ public class ExcluirClienteTests : DesafioFinalCaixaversoClassFixture
 
         await Factory.ExecutarNoContextoAsync(async contexto =>
         {
-            var existe = await contexto.Clientes.AnyAsync();
-            existe.ShouldBeFalse();
+            var existeCliente = await contexto.Clientes.AnyAsync();
+            existeCliente.ShouldBeFalse();
+
+            var perfilDinamicoExiste = await contexto.ClientePerfisDinamicos.AnyAsync();
+            perfilDinamicoExiste.ShouldBeFalse();
         });
     }
 

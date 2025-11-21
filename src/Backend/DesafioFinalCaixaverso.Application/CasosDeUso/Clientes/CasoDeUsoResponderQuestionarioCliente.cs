@@ -11,6 +11,7 @@ using DesafioFinalCaixaverso.Dominio.Repositorios;
 using DesafioFinalCaixaverso.Exceptions;
 using DesafioFinalCaixaverso.Exceptions.ExceptionsBase;
 using Mapster;
+using SimulacaoDominio = DesafioFinalCaixaverso.Dominio.Entidades.Simulacao;
 
 namespace DesafioFinalCaixaverso.Aplicacao.CasosDeUso.Clientes;
 
@@ -100,7 +101,7 @@ public class CasoDeUsoResponderQuestionarioCliente : ICasoDeUsoResponderQuestion
 
     private async Task SincronizarPerfilQuestionario(Guid clienteId, QuestionarioInvestidor questionario, CancellationToken cancellationToken)
     {
-        var resultado = _calculadoraPerfilInvestidor.Calcular(clienteId, Array.Empty<Simulacao>(), questionario);
+    var resultado = _calculadoraPerfilInvestidor.Calcular(clienteId, Array.Empty<SimulacaoDominio>(), questionario);
         var perfilExistente = await _clientePerfilRepositorio.ObterPorClienteAsync(clienteId, cancellationToken);
 
         if (perfilExistente is null)
