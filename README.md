@@ -1,6 +1,6 @@
 # DesafioFinalCaixaverso
 
-Plataforma completa para simulação de investimentos, classificação de perfil de risco (compliance ANBIMA) e recomendação de produtos Caixa. O projeto está dividido em camadas (`API`, `Application`, `Domain`, `Infrastructure` e `Communications`) mais a suíte de testes.
+Plataforma completa para simulação de investimentos, classificação de perfil de risco (compliance ANBIMA) e recomendação de produtos Caixa. O projeto está dividido em camadas com os respectivos projetos: API (`DesafioFinalCaixaverso.API`), Aplicação (`DesafioFinalCaixaverso.Application`), Domínio (`DesafioFinalCaixaverso.Domain`), Infraestrutura (`DesafioFinalCaixaverso.Infrastructure`) e Comunicações (`DesafioFinalCaixaverso.Communications`), além da suíte de testes.
 
 ## ⚙️ Requisitos
 
@@ -21,28 +21,11 @@ dotnet test DesafioFinalCaixaverso.slnx
 
 ### Subindo com Docker Compose
 
-1. Configure variáveis sensíveis:
+```powershell
+docker compose up -d --build
+```
 
-	```powershell
-	cd source
-	copy .env.example .env
-	# edite o arquivo e altere CAIXAVERSO_SQL_PASSWORD
-	```
-
-2. Start da stack (API + SQL Server):
-
-	```powershell
-	docker compose up -d --build
-	```
-
-3. A Swagger UI sobe em `http://localhost:8080/swagger`.
-
-4. Para encerrar:
-
-	```powershell
-	docker compose down
-	docker compose down -v # remove volume de dados
-	```
+Swagger UI: `http://localhost:8080/swagger`
 
 ### Seeds
 

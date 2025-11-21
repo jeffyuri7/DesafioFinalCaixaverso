@@ -17,7 +17,7 @@ RUN apt-get update \
 	&& groupadd --system appgroup \
 	&& useradd --system --gid appgroup --create-home --shell /usr/sbin/nologin appuser
 
-COPY --from=build-env --chown=appuser:appgroup --chmod=555 /app/out .
+COPY --from=build-env --chown=root:root --chmod=555 /app/out .
 
 USER appuser
 
