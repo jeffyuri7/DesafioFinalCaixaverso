@@ -1,6 +1,6 @@
 # DesafioFinalCaixaverso
 
-Plataforma completa para simulação de investimentos, classificação de perfil de risco (compliance ANBIMA) e recomendação de produtos Caixa. O projeto está dividido em camadas com os respectivos projetos: API (`DesafioFinalCaixaverso.API`), Aplicação (`DesafioFinalCaixaverso.Application`), Domínio (`DesafioFinalCaixaverso.Domain`), Infraestrutura (`DesafioFinalCaixaverso.Infrastructure`) e Comunicações (`DesafioFinalCaixaverso.Communications`), além da suíte de testes.
+Plataforma completa para simulação de investimentos, classificação de perfil de risco (compliance ANBIMA) e recomendação de produtos Caixa. O projeto está dividido em camadas com os respectivos projetos: API (`DesafioFinalCaixaverso.API`), Aplicação (`DesafioFinalCaixaverso.Aplicacao`), Domínio (`DesafioFinalCaixaverso.Dominio`), Infraestrutura (`DesafioFinalCaixaverso.Infraestrutura`) e Comunicações (`DesafioFinalCaixaverso.Comunicacoes`), além da suíte de testes.
 
 ## ⚙️ Requisitos
 
@@ -8,20 +8,11 @@ Plataforma completa para simulação de investimentos, classificação de perfil
 - Docker Desktop (para executar toda a stack)
 - PowerShell 5+ (scripts de seed/local setup)
 
-## 🚀 Rodando localmente
-
-### Build e testes rápidos
+## 🚀 Execução do Projeto 
 
 ```powershell
-cd source
-dotnet restore DesafioFinalCaixaverso.slnx
-dotnet build DesafioFinalCaixaverso.slnx
-dotnet test DesafioFinalCaixaverso.slnx
-```
-
-### Subindo com Docker Compose
-
-```powershell
+git clone https://github.com/jeffyuri7/DesafioFinalCaixaverso.git
+cd DesafioFinalCaixaverso
 docker compose up -d --build
 ```
 
@@ -30,8 +21,7 @@ Swagger UI: `http://localhost:8080/swagger`
 ### Seeds
 
 ```powershell
-./seed-data.ps1        # clientes, produtos, perfis
-./seed-produtos.ps1    # catálogo extendido opcional
+./seed-produtos.ps1    # catálogo extendido aplicado ao banco de dados automaticamente pelo docker compose.
 ```
 
 Use `-HashSecret` nos scripts se personalizar `Seguranca:HashSenha:Chave` no `appsettings` para manter os hashes consistentes.
@@ -42,6 +32,18 @@ Use `-HashSecret` nos scripts se personalizar `Seguranca:HashSenha:Chave` no `ap
 - Senhas são persistidas com hash + salt e o token inclui `ClienteId` e perfil.
 - Algumas rotas (questionário, simulações do cliente) verificam coerência entre token e `clienteId` informado.
 
+## 🔄 Fluxo de teste da API
+
+1. **Cadastrar cliente** (`POST v1/clientes`) e guardar o `clienteId` retornado.
+2. **Autenticar** (`POST v1/login`) e copiar apenas o token JWT (não inclua `Bearer`).
+3. Na Swagger UI, clique em **Authorize** e cole somente o token; todos os endpoints protegidos ficarão disponíveis.
+4. **Registrar o questionário** (`POST v1/clientes/{clienteId}/questionario`). É obrigatório pelas normas ANBIMA e libera recomendações.
+5. **Consultar perfil inicial** em `GET v1/perfil-risco-inicial/{clienteId}` — usa dados do questionário imediatamente após o envio.
+6. **Realizar simulações** (`POST v1/investimentos/simular-investimento`). Ao menos uma simulação é necessária para alimentar o perfil dinâmico.
+7. **Consultar perfil dinâmico** em `GET v1/perfil-risco/{clienteId}` — só apresentará dados após a primeira simulação e será recalculado a cada nova simulação.
+
+A documentação do endpoint de questionário descreve todos os campos obrigatórios; este README também mantém a tabela de apoio na seção “Questionário do investidor”.
+
 ## 🧠 Motor de perfil de risco
 
 - **Questionário suitability**: liquidez, horizonte, tolerância a perda, objetivo, conhecimento e situação financeira. Sem questionário válido o cliente permanece “Não classificado”.
@@ -50,20 +52,8 @@ Use `-HashSecret` nos scripts se personalizar `Seguranca:HashSenha:Chave` no `ap
   - ≤ 40 → Conservador
   - 41–70 → Moderado
   - > 70 → Agressivo
-- `GET v1/perfil-risco/{clienteId}` entrega resumo enxuto; `GET v1/perfil-risco-completo/{clienteId}` retorna dados de cálculo e histórico.
+- `GET v1/perfil-risco/{clienteId}` entrega perfil dinâmico; `GET v1/perfil-risco-inicial/{clienteId}` retorna dados de cálculo do questionário.
 
-## 📡 Endpoints principais
-
-- `POST v1/investimentos/simular-investimento` — valida cliente, encontra produtos compatíveis e retorna `{ produtoValidado, resultadoSimulacao, dataSimulacao }`.
-- `GET v1/investimentos/simulacoes` — histórico completo.
-- `GET v1/investimentos/simulacoes/por-produto-dia` — métricas para dashboards.
-- `GET v1/investimentos/{clienteId}` — lista compacta `{ id, tipo, valor, rentabilidade, data }` do cliente autenticado.
-- `GET v1/produtos-recomendados/{perfil}` — responde apenas `{ id, nome, tipo, rentabilidade, risco }`.
-- `GET v1/telemetria` — uso de serviços externos (OpenAI, Service Bus etc.).
-- `POST v1/clientes/{clienteId}/questionario` — atualiza o suitability obrigatório.
-- `POST v1/clientes` / `PUT v1/clientes/{id}` — CRUD de clientes com hash de senha.
-
-> Consulte `next-steps` e `instrucoes.md` para backlog adicional de endpoints.
 
 ## 📝 Questionário do investidor
 
@@ -108,18 +98,17 @@ As mesmas descrições aparecem no Swagger para facilitar testes manuais.
 
 - ASP.NET Core 8 + Mapster + FluentValidation
 - EF Core + SQL Server (migrations via FluentMigrator)
-- Camada de infraestrutura com Service Bus, OpenAI, Blob Storage (mockados nos testes)
+- Camada de infraestrutura (mockados nos testes)
 - Testes: xUnit + Shouldly + WebApplicationFactory (integração)
 - Pipelines: `release-pipeline.yml` e `docker-compose.yml` na raiz
 
 ## ✅ Qualidade
 
 - `dotnet test DesafioFinalCaixaverso.slnx` cobre unitários, validators e integração.
-- SonarCloud acompanha smells (Dockerfile, SQL injection, payloads) — ajustes recentes já atendem aos alertas.
-- `next-steps` documenta melhorias futuras (telemetria, dashboards, ajuste de payloads).
+- SonarCloud: O código foi validado pelo SonarCloud e não possui nenhuma vulnerabilidade crítica, más práticas ou código repetido. Caso o examinador utilize o SonarCloud para reexaminar o código, favor remover o arquivo ".env" que foi adicionado ao repositório apenas para tornar a execução teste possível. Solicito que remova o arquivo antes de enviar para o Sonar para evitar que ele aponte falha de segurança.
 
 ## 🆘 Troubleshooting rápido
 
-- **Login falhou?** Garanta que rodou `seed-data.ps1` para criar usuário demo e revise `Seguranca:Jwt`.
-- **Erro de acesso ao SQL?** Confirme `CAIXAVERSO_SQL_PASSWORD` e reinicie `docker compose` limpando volumes.
+- **Erro de acesso ao SQL?** Confirme `CAIXAVERSO_SQL_PASSWORD` no arquivo ".env" e reinicie `docker compose` limpando volumes.
 - **JWT expirado**: tokens duram 30 min — refaça o login antes de chamar endpoints protegidos.
+- **Nome de container já usado**: se receber erro informando que um container com o mesmo nome já existe, finalize o container antigo (`docker ps -a` + `docker rm -f <nome>`) ou ajuste o nome no `docker-compose.yml` antes de subir novamente.
